@@ -1,0 +1,41 @@
+# Blender
+*.blend1
+*.blend2
+
+# OpenFOAM runtime output
+openfoam/f1_baseline/[1-9]*
+openfoam/f1_baseline/0.[0-9]*
+openfoam/f1_baseline/postProcessing/
+openfoam/f1_baseline/processor*
+openfoam/f1_baseline/constant/polyMesh/
+openfoam/f1_baseline/constant/extendedFeatureEdgeMesh/
+*.eMesh
+logs/
+
+# STL files (generated, can be large)
+openfoam/f1_baseline/constant/triSurface/*.stl
+
+# Blender output
+blender/*.blend
+
+# Results (keep JSON, ignore large files)
+results/*.vtk
+results/*.vtp
+results/*.foam
+
+# Vendor (cloned repos)
+vendor/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

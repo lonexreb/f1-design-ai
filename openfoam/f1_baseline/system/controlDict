@@ -1,0 +1,114 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// F1 Car External Aerodynamics - Steady State RANS
+// Based on Ravelli & Savini (2018) validated methodology
+
+application     simpleFoam;
+
+startFrom       startTime;
+startTime       0;
+stopAt          endTime;
+endTime         2000;           // iterations for steady state
+
+deltaT          1;
+
+writeControl    timeStep;
+writeInterval   200;
+purgeWrite      3;              // Keep last 3 time directories
+
+writeFormat     ascii;
+writePrecision  8;
+writeCompression off;
+
+timeFormat      general;
+timePrecision   6;
+
+runTimeModifiable true;
+
+// Force and coefficient monitoring
+functions
+{
+    // Aerodynamic forces on the car
+    forces
+    {
+        type            forces;
+        libs            (forces);
+        writeControl    timeStep;
+        writeInterval   1;
+
+        patches         (car);      // Patch name for car surface
+        rho             rhoInf;
+        rhoInf          1.225;      // Air density at sea level [kg/m^3]
+        CofR            (0 0 0.15); // Center of rotation (approx CG)
+    }
+
+    // Force coefficients
+    forceCoeffs
+    {
+        type            forceCoeffs;
+        libs            (forces);
+        writeControl    timeStep;
+        writeInterval   1;
+
+        patches         (car);
+        rho             rhoInf;
+        rhoInf          1.225;
+        CofR            (0 0 0.15);
+
+        // Reference values for coefficient calculation
+        liftDir         (0 0 1);
+        dragDir         (1 0 0);
+        pitchAxis       (0 1 0);
+
+        magUInf         83.33;      // 300 km/h = 83.33 m/s
+        lRef            5.640;      // Car length [m]
+        Aref            1.5;        // Frontal area [m^2]
+    }
+
+    // Pressure coefficient on car surface
+    pressureCoeff
+    {
+        type            pressure;
+        libs            (fieldFunctionObjects);
+        writeControl    writeTime;
+
+        mode            staticCoeff;
+        pInf            0;          // Reference pressure
+        UInf            (83.33 0 0);
+        rhoInf          1.225;
+    }
+
+    // y+ monitoring (wall resolution check)
+    yPlus
+    {
+        type            yPlus;
+        libs            (fieldFunctionObjects);
+        writeControl    writeTime;
+    }
+
+    // Residual monitoring
+    residuals
+    {
+        type            solverInfo;
+        libs            (utilityFunctionObjects);
+        writeControl    timeStep;
+        writeInterval   1;
+        fields          (U p k omega);
+    }
+}
+
+// ************************************************************************* //

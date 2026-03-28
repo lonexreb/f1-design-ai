@@ -1,0 +1,103 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Wind tunnel domain for F1 car simulation
+// Domain sized for external aero: ~5L upstream, ~10L downstream, ~5W lateral
+// Car length ~5.64m, width ~2.0m
+
+scale 1;
+
+// Domain boundaries (meters)
+// Car centered at origin, nose at x=-2.5
+xMin    -30;    // ~5 car lengths upstream
+xMax     60;    // ~10 car lengths downstream
+yMin    -15;    // ~7.5 car widths lateral
+yMax     15;
+zMin      0;    // Ground plane
+zMax     20;    // ~10 car heights above
+
+vertices
+(
+    ($xMin $yMin $zMin)    // 0
+    ($xMax $yMin $zMin)    // 1
+    ($xMax $yMax $zMin)    // 2
+    ($xMin $yMax $zMin)    // 3
+    ($xMin $yMin $zMax)    // 4
+    ($xMax $yMin $zMax)    // 5
+    ($xMax $yMax $zMax)    // 6
+    ($xMin $yMax $zMax)    // 7
+);
+
+blocks
+(
+    // Base mesh: coarse, will be refined by snappyHexMesh near car
+    hex (0 1 2 3 4 5 6 7) (60 20 15) simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+boundary
+(
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+        );
+    }
+
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (1 2 6 5)
+        );
+    }
+
+    ground
+    {
+        type wall;
+        faces
+        (
+            (0 3 2 1)
+        );
+    }
+
+    top
+    {
+        type symmetryPlane;
+        faces
+        (
+            (4 5 6 7)
+        );
+    }
+
+    sides
+    {
+        type symmetryPlane;
+        faces
+        (
+            (0 1 5 4)
+            (3 7 6 2)
+        );
+    }
+);
+
+// ************************************************************************* //

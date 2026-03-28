@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      k;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Turbulent kinetic energy
+// k = 1.5 * (U * I)^2 where I = 0.01 (1% turbulence intensity)
+// k = 1.5 * (83.33 * 0.01)^2 = 1.5 * 0.6944 = 1.042
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 1.042;
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform 1.042;
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+    car
+    {
+        type            kqRWallFunction;
+        value           uniform 1.042;
+    }
+
+    ground
+    {
+        type            kqRWallFunction;
+        value           uniform 1.042;
+    }
+
+    top
+    {
+        type            symmetryPlane;
+    }
+
+    sides
+    {
+        type            symmetryPlane;
+    }
+}
+
+// ************************************************************************* //

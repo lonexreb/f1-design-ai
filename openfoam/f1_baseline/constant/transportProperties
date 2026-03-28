@@ -1,0 +1,25 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Air at 20C, sea level
+// Kinematic viscosity nu = mu/rho = 1.516e-5 m^2/s
+// Reynolds number at 300 km/h over 5.64m car: Re = U*L/nu ~ 31 million
+
+transportModel  Newtonian;
+
+nu              1.516e-05;
+
+// ************************************************************************* //

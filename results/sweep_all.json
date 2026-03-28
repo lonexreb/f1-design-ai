@@ -1,0 +1,514 @@
+[
+  {
+    "params": {
+      "ride_height": 0.02,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -4.2,
+    "ld_ratio": 4.42,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.025,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.85,
+    "ld_ratio": 4.05,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.5,
+    "ld_ratio": 3.68,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.035,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.5,
+    "ld_ratio": 3.68,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.04,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.2375,
+    "ld_ratio": 3.41,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.05,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -2.7125,
+    "ld_ratio": 2.86,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 10,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.874,
+    "cl": -3.08,
+    "ld_ratio": 3.52,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 12,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.912,
+    "cl": -3.29,
+    "ld_ratio": 3.61,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.5,
+    "ld_ratio": 3.68,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 16,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.988,
+    "cl": -3.71,
+    "ld_ratio": 3.76,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 18,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 1.026,
+    "cl": -3.92,
+    "ld_ratio": 3.82,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 20,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 1.064,
+    "cl": -4.13,
+    "ld_ratio": 3.88,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 10,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.7505,
+    "cl": -2.66,
+    "ld_ratio": 3.54,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 12,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.817,
+    "cl": -2.94,
+    "ld_ratio": 3.6,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 14,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.8835,
+    "cl": -3.22,
+    "ld_ratio": 3.64,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.5,
+    "ld_ratio": 3.68,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 18,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 1.0165,
+    "cl": -3.78,
+    "ld_ratio": 3.72,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 20,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 1.083,
+    "cl": -4.06,
+    "ld_ratio": 3.75,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 22,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 1.1495,
+    "cl": -4.34,
+    "ld_ratio": 3.78,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 6,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.15,
+    "ld_ratio": 3.32,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 8,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.22,
+    "ld_ratio": 3.39,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 10,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.36,
+    "ld_ratio": 3.54,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.5,
+    "ld_ratio": 3.68,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 14,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.64,
+    "ld_ratio": 3.83,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 16,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.325,
+    "ld_ratio": 3.5,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 18,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -2.975,
+    "ld_ratio": 3.13,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.08
+    },
+    "cd": 0.95,
+    "cl": -3.3775,
+    "ld_ratio": 3.56,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.1
+    },
+    "cd": 0.95,
+    "cl": -3.4125,
+    "ld_ratio": 3.59,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.12
+    },
+    "cd": 0.95,
+    "cl": -3.4475,
+    "ld_ratio": 3.63,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.5,
+    "ld_ratio": 3.68,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.18
+    },
+    "cd": 0.95,
+    "cl": -3.5525,
+    "ld_ratio": 3.74,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  },
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.2
+    },
+    "cd": 0.95,
+    "cl": -3.5875,
+    "ld_ratio": 3.78,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  }
+]
