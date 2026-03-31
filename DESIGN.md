@@ -34,7 +34,7 @@ Each backend returns a compatible `SimulationResult`. If the chosen backend fail
 
 ### Graceful Degradation
 - Blender unavailable: skip geometry, use estimation backends
-- OpenFOAM unavailable: use Docker wrapper, or fall to Modulus/surrogate/empirical
+- OpenFOAM unavailable: use Docker wrapper (`scripts/openfoam-docker.sh`, image: `microfluidica/openfoam:2406`, `--platform linux/amd64` for Apple Silicon), or fall to Modulus/surrogate/empirical
 - Omniverse unavailable: fall to OpenFOAM or below
 - No trained models: auto-train from existing results, or use empirical
 - Nothing installed: empirical estimates still work
@@ -197,7 +197,7 @@ Max global cells: 5 million.
 - **Outlet**: Zero gradient for all fields
 - **Car surface**: No-slip walls
 - **Ground**: Moving wall at 83.33 m/s (simulates car motion relative to road)
-- **Top/sides**: Symmetry planes
+- **Top/sides**: Symmetry (`symmetry` type, compatible with OpenFOAM v2406+; replaces deprecated `symmetryPlane`)
 
 ### Solver Settings
 - SIMPLEC algorithm (consistent pressure correction, faster convergence)

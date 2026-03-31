@@ -10,6 +10,7 @@ scripts/run_pipeline.py           Pipeline orchestrator with 5 simulation backen
 scripts/omniverse_sim.py          NVIDIA Omniverse Flow GPU CFD backend
 scripts/convert_to_usd.py         STL -> USD conversion for Omniverse (wind tunnel scene)
 scripts/modulus_surrogate.py      NVIDIA Modulus PINN surrogate (F1AeroNet, physics-constrained)
+scripts/openfoam-docker.sh        OpenFOAM Docker wrapper (fallback when not installed locally)
 scripts/install.sh                macOS tool installer (Homebrew-based)
 config.yaml                       Central configuration (backends, physics, ML hyperparameters, paths)
 ml/                               ML surrogate pipeline:

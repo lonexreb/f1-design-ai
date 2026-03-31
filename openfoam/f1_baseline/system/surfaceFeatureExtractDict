@@ -9,52 +9,21 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volVectorField;
-    object      U;
+    class       dictionary;
+    object      surfaceFeatureExtractDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Freestream velocity: 300 km/h = 83.33 m/s (typical F1 straight-line speed)
-
-dimensions      [0 1 -1 0 0 0 0];
-
-internalField   uniform (83.33 0 0);
-
-boundaryField
+f1_car_combined.stl
 {
-    inlet
+    extractionMethod    extractFromSurface;
+
+    extractFromSurfaceCoeffs
     {
-        type            fixedValue;
-        value           uniform (83.33 0 0);
+        includedAngle   150;
     }
 
-    outlet
-    {
-        type            zeroGradient;
-    }
-
-    car
-    {
-        type            noSlip;
-    }
-
-    ground
-    {
-        // Moving ground plane (same speed as freestream to simulate
-        // the car moving over stationary ground)
-        type            fixedValue;
-        value           uniform (83.33 0 0);
-    }
-
-    top
-    {
-        type            symmetryPlane;
-    }
-
-    sides
-    {
-        type            symmetry;
-    }
+    writeObj            no;
 }
 
 // ************************************************************************* //

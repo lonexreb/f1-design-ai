@@ -5,7 +5,7 @@
 #          ./openfoam-docker.sh blockMesh
 
 CASE_DIR="${OPENFOAM_CASE_DIR:-$(pwd)}"
-OPENFOAM_IMAGE="${OPENFOAM_IMAGE:-openfoam/openfoam-dev}"
+OPENFOAM_IMAGE="${OPENFOAM_IMAGE:-microfluidica/openfoam:2406}"
 
 if ! command -v docker &>/dev/null; then
     echo "Error: Docker not found. Install Docker Desktop first."
@@ -19,6 +19,7 @@ if ! docker image inspect "$OPENFOAM_IMAGE" &>/dev/null; then
 fi
 
 docker run --rm \
+    --platform linux/amd64 \
     -v "$CASE_DIR":/data \
     -w /data \
     "$OPENFOAM_IMAGE" \

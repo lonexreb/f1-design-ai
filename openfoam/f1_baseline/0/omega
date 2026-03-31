@@ -55,7 +55,7 @@ boundaryField
 
     sides
     {
-        type            symmetryPlane;
+        type            symmetry;
     }
 }
 

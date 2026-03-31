@@ -21,6 +21,8 @@ castellatedMesh true;
 snap            true;
 addLayers       true;
 
+mergeTolerance  1e-6;
+
 geometry
 {
     f1_car_combined.stl
@@ -114,7 +116,7 @@ castellatedMeshControls
         }
     }
 
-    locationInMesh (0 0 5);     // Point inside the mesh (outside the car)
+    locationInMesh (0 -10 10);  // Point inside the mesh (outside the car, far from geometry)
     allowFreeStandingZoneFaces true;
 }
 
@@ -159,7 +161,7 @@ addLayersControls
     nSmoothThickness    10;
     nSmoothNormals      3;
     maxThicknessToMedialRatio 0.3;
-    minMedianAxisAngle  90;
+    minMedialAxisAngle  90;
     nBufferCellsNoExtrude 0;
     nLayerIter          50;
 }

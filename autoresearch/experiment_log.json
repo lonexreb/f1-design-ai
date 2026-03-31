@@ -1,0 +1,500 @@
+[
+  {
+    "model": "linear",
+    "model_kwargs": {},
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 0.0018608570098876953,
+      "train_mse": 0.23328766226768494,
+      "n_features": 20,
+      "degree": 2
+    },
+    "train_eval": {
+      "mse_cd": 0.0006379283149726689,
+      "mae_cd": 0.01350413542240858,
+      "r2_cd": 0.8791171312332153,
+      "mse_cl": 0.03390086814761162,
+      "mae_cl": 0.13326337933540344,
+      "r2_cl": 0.7997816801071167,
+      "mse_ld_ratio": 0.023000076413154602,
+      "mae_ld_ratio": 0.09422530978918076,
+      "r2_ld_ratio": 0.700922429561615,
+      "physics_violations": 0,
+      "total_mse": 0.019179625436663628
+    },
+    "test_eval": {
+      "mse_cd": 0.0005439714295789599,
+      "mae_cd": 0.01869508996605873,
+      "r2_cd": 0.7598848938941956,
+      "mse_cl": 0.07407008856534958,
+      "mae_cl": 0.228346586227417,
+      "r2_cl": -0.07445251941680908,
+      "mse_ld_ratio": 0.06852393597364426,
+      "mae_ld_ratio": 0.18229007720947266,
+      "r2_ld_ratio": -1.8301355838775635,
+      "physics_violations": 0,
+      "total_mse": 0.04771266505122185
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/linear_latest.pkl",
+    "timestamp": "2026-03-31 02:31:38"
+  },
+  {
+    "model": "mlp",
+    "model_kwargs": {},
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 0.18857336044311523,
+      "train_mse": 0.12433451414108276,
+      "epochs": 500,
+      "device": "cpu"
+    },
+    "train_eval": {
+      "mse_cd": 0.00019831176905427128,
+      "mae_cd": 0.009646082296967506,
+      "r2_cd": 0.9624212980270386,
+      "mse_cl": 0.010774802416563034,
+      "mae_cl": 0.08098670095205307,
+      "r2_cl": 0.9363640546798706,
+      "mse_ld_ratio": 0.012304991483688354,
+      "mae_ld_ratio": 0.07376165688037872,
+      "r2_ld_ratio": 0.8399941325187683,
+      "physics_violations": 0,
+      "total_mse": 0.007759368512779474
+    },
+    "test_eval": {
+      "mse_cd": 0.00015524530317634344,
+      "mae_cd": 0.009588769637048244,
+      "r2_cd": 0.9314729571342468,
+      "mse_cl": 0.06749487668275833,
+      "mae_cl": 0.18266354501247406,
+      "r2_cl": 0.02092677354812622,
+      "mse_ld_ratio": 0.060091108083724976,
+      "mae_ld_ratio": 0.15157072246074677,
+      "r2_ld_ratio": -1.4818477630615234,
+      "physics_violations": 0,
+      "total_mse": 0.042580414563417435
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/mlp_latest.pt",
+    "timestamp": "2026-03-31 02:31:39"
+  },
+  {
+    "model": "gp",
+    "model_kwargs": {},
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 0.4582858085632324,
+      "backend": "gpytorch",
+      "device": "cpu",
+      "n_outputs": 3
+    },
+    "train_eval": {
+      "mse_cd": 1.148497208447452e-08,
+      "mae_cd": 5.3799150919076055e-05,
+      "r2_cd": 0.9999977946281433,
+      "mse_cl": 2.319238312509242e-08,
+      "mae_cl": 0.00010675430530682206,
+      "r2_cl": 0.9999998807907104,
+      "mse_ld_ratio": 2.7136957125861727e-09,
+      "mae_ld_ratio": 3.625869794632308e-05,
+      "r2_ld_ratio": 0.9999999403953552,
+      "physics_violations": 0,
+      "total_mse": 1.2463684306851519e-08
+    },
+    "test_eval": {
+      "mse_cd": 4.196914233034477e-06,
+      "mae_cd": 0.0010706697357818484,
+      "r2_cd": 0.9981474280357361,
+      "mse_cl": 0.029858188703656197,
+      "mae_cl": 0.13440506160259247,
+      "r2_cl": 0.5668804049491882,
+      "mse_ld_ratio": 0.011835419572889805,
+      "mae_ld_ratio": 0.0871812254190445,
+      "r2_ld_ratio": 0.5111804008483887,
+      "physics_violations": 0,
+      "total_mse": 0.013899266719818115
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/gp_latest.pkl",
+    "timestamp": "2026-03-31 02:31:40"
+  },
+  {
+    "model": "pinn",
+    "model_kwargs": {},
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 8.015187978744507,
+      "train_mse": 1.0569702681095805e-05,
+      "epochs": 2000,
+      "device": "mps"
+    },
+    "train_eval": {
+      "mse_cd": 8.300949616568687e-08,
+      "mae_cd": 0.0001490926806582138,
+      "r2_cd": 0.9999842643737793,
+      "mse_cl": 1.2408024758769898e-06,
+      "mae_cl": 0.0005405712290666997,
+      "r2_cl": 0.9999926686286926,
+      "mse_ld_ratio": 4.0458013472743914e-07,
+      "mae_ld_ratio": 0.0003466701600700617,
+      "r2_ld_ratio": 0.9999947547912598,
+      "physics_violations": 0,
+      "total_mse": 5.761307306784147e-07
+    },
+    "test_eval": {
+      "mse_cd": 0.00020386649703141302,
+      "mae_cd": 0.00820857286453247,
+      "r2_cd": 0.9100110530853271,
+      "mse_cl": 0.010077284649014473,
+      "mae_cl": 0.07031835615634918,
+      "r2_cl": 0.8538200259208679,
+      "mse_ld_ratio": 0.002304848749190569,
+      "mae_ld_ratio": 0.03276405856013298,
+      "r2_ld_ratio": 0.9048064947128296,
+      "physics_violations": 0,
+      "total_mse": 0.004195333458483219
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/pinn_latest.pt",
+    "timestamp": "2026-03-31 02:31:48"
+  },
+  {
+    "model": "mlp",
+    "model_kwargs": {
+      "hidden_layers": [
+        32,
+        32
+      ],
+      "lr": 0.001,
+      "epochs": 300
+    },
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 0.05433964729309082,
+      "train_mse": 0.35910722613334656,
+      "epochs": 300,
+      "device": "cpu"
+    },
+    "train_eval": {
+      "mse_cd": 0.0023445941042155027,
+      "mae_cd": 0.035199180245399475,
+      "r2_cd": 0.5557160377502441,
+      "mse_cl": 0.029756493866443634,
+      "mae_cl": 0.13255107402801514,
+      "r2_cl": 0.8242583274841309,
+      "mse_ld_ratio": 0.031145690008997917,
+      "mae_ld_ratio": 0.11809629201889038,
+      "r2_ld_ratio": 0.595002293586731,
+      "physics_violations": 0,
+      "total_mse": 0.021082255989313126
+    },
+    "test_eval": {
+      "mse_cd": 0.002014650497585535,
+      "mae_cd": 0.042121563106775284,
+      "r2_cd": 0.11071056127548218,
+      "mse_cl": 0.11799218505620956,
+      "mae_cl": 0.2819215655326843,
+      "r2_cl": -0.7115817070007324,
+      "mse_ld_ratio": 0.07260977476835251,
+      "mae_ld_ratio": 0.16289107501506805,
+      "r2_ld_ratio": -1.9988863468170166,
+      "physics_violations": 0,
+      "total_mse": 0.06420553475618362
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/mlp_latest.pt",
+    "timestamp": "2026-03-31 02:31:48"
+  },
+  {
+    "model": "mlp",
+    "model_kwargs": {
+      "hidden_layers": [
+        128,
+        128,
+        64
+      ],
+      "lr": 0.0005,
+      "epochs": 800
+    },
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 0.30457496643066406,
+      "train_mse": 0.058734867721796036,
+      "epochs": 800,
+      "device": "cpu"
+    },
+    "train_eval": {
+      "mse_cd": 5.769192648585886e-05,
+      "mae_cd": 0.00443111639469862,
+      "r2_cd": 0.989067792892456,
+      "mse_cl": 0.006066971458494663,
+      "mae_cl": 0.06356049329042435,
+      "r2_cl": 0.9641684889793396,
+      "mse_ld_ratio": 0.006607466842979193,
+      "mae_ld_ratio": 0.05966085568070412,
+      "r2_ld_ratio": 0.9140809178352356,
+      "physics_violations": 0,
+      "total_mse": 0.004244043491780758
+    },
+    "test_eval": {
+      "mse_cd": 0.00012241188960615546,
+      "mae_cd": 0.00783249270170927,
+      "r2_cd": 0.9459660053253174,
+      "mse_cl": 0.04342435672879219,
+      "mae_cl": 0.15879610180854797,
+      "r2_cl": 0.3700910806655884,
+      "mse_ld_ratio": 0.037584610283374786,
+      "mae_ld_ratio": 0.14058136940002441,
+      "r2_ld_ratio": -0.5522975921630859,
+      "physics_violations": 0,
+      "total_mse": 0.027043793350458145
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/mlp_latest.pt",
+    "timestamp": "2026-03-31 02:31:48"
+  },
+  {
+    "model": "mlp",
+    "model_kwargs": {
+      "hidden_layers": [
+        64,
+        64,
+        64,
+        32
+      ],
+      "lr": 0.001,
+      "epochs": 500
+    },
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 0.2012920379638672,
+      "train_mse": 0.10087991505861282,
+      "epochs": 500,
+      "device": "cpu"
+    },
+    "train_eval": {
+      "mse_cd": 0.00011031978647224605,
+      "mae_cd": 0.0067785619758069515,
+      "r2_cd": 0.9790951609611511,
+      "mse_cl": 0.011433647945523262,
+      "mae_cl": 0.0748690590262413,
+      "r2_cl": 0.9324729442596436,
+      "mse_ld_ratio": 0.013301405124366283,
+      "mae_ld_ratio": 0.07302922010421753,
+      "r2_ld_ratio": 0.8270374536514282,
+      "physics_violations": 0,
+      "total_mse": 0.008281789720058441
+    },
+    "test_eval": {
+      "mse_cd": 0.00024201338237617165,
+      "mae_cd": 0.010810920037329197,
+      "r2_cd": 0.893172562122345,
+      "mse_cl": 0.09055059403181076,
+      "mae_cl": 0.20888331532478333,
+      "r2_cl": -0.3135169744491577,
+      "mse_ld_ratio": 0.09333882480859756,
+      "mae_ld_ratio": 0.19140632450580597,
+      "r2_ld_ratio": -2.85502552986145,
+      "physics_violations": 0,
+      "total_mse": 0.061377137899398804
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/mlp_latest.pt",
+    "timestamp": "2026-03-31 02:31:49"
+  },
+  {
+    "model": "linear",
+    "model_kwargs": {
+      "degree": 2,
+      "alpha": 0.1
+    },
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 0.0007338523864746094,
+      "train_mse": 0.09035484492778778,
+      "n_features": 20,
+      "degree": 2
+    },
+    "train_eval": {
+      "mse_cd": 4.5071621570969e-05,
+      "mae_cd": 0.003777089063078165,
+      "r2_cd": 0.9914592504501343,
+      "mse_cl": 0.01207592710852623,
+      "mae_cl": 0.07633053511381149,
+      "r2_cl": 0.9286796450614929,
+      "mse_ld_ratio": 0.012244091369211674,
+      "mae_ld_ratio": 0.07559402287006378,
+      "r2_ld_ratio": 0.8407860398292542,
+      "physics_violations": 0,
+      "total_mse": 0.008121696300804615
+    },
+    "test_eval": {
+      "mse_cd": 0.00011247453949181363,
+      "mae_cd": 0.008713177405297756,
+      "r2_cd": 0.9503524899482727,
+      "mse_cl": 0.06882929801940918,
+      "mae_cl": 0.19068029522895813,
+      "r2_cl": 0.0015697479248046875,
+      "mse_ld_ratio": 0.07909636944532394,
+      "mae_ld_ratio": 0.1883382797241211,
+      "r2_ld_ratio": -2.266792058944702,
+      "physics_violations": 0,
+      "total_mse": 0.04934604838490486
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/linear_latest.pkl",
+    "timestamp": "2026-03-31 02:31:49"
+  },
+  {
+    "model": "linear",
+    "model_kwargs": {
+      "degree": 3,
+      "alpha": 1.0
+    },
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 0.0003829002380371094,
+      "train_mse": 0.18771424889564514,
+      "n_features": 55,
+      "degree": 3
+    },
+    "train_eval": {
+      "mse_cd": 0.00044934474863111973,
+      "mae_cd": 0.011327874846756458,
+      "r2_cd": 0.9148523807525635,
+      "mse_cl": 0.027166105806827545,
+      "mae_cl": 0.11005303263664246,
+      "r2_cl": 0.8395571112632751,
+      "mse_ld_ratio": 0.019466055557131767,
+      "mae_ld_ratio": 0.08827540278434753,
+      "r2_ld_ratio": 0.7468764781951904,
+      "physics_violations": 0,
+      "total_mse": 0.01569383591413498
+    },
+    "test_eval": {
+      "mse_cd": 0.000438830436905846,
+      "mae_cd": 0.01844431646168232,
+      "r2_cd": 0.8062952756881714,
+      "mse_cl": 0.06462018936872482,
+      "mae_cl": 0.21093294024467468,
+      "r2_cl": 0.0626266598701477,
+      "mse_ld_ratio": 0.0680147334933281,
+      "mae_ld_ratio": 0.18569687008857727,
+      "r2_ld_ratio": -1.8091046810150146,
+      "physics_violations": 0,
+      "total_mse": 0.044357914477586746
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/linear_latest.pkl",
+    "timestamp": "2026-03-31 02:31:49"
+  },
+  {
+    "model": "pinn",
+    "model_kwargs": {
+      "epochs": 1000,
+      "physics_weight": 0.05
+    },
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 4.025511026382446,
+      "train_mse": 3.766079680644907e-05,
+      "epochs": 1000,
+      "device": "mps"
+    },
+    "train_eval": {
+      "mse_cd": 3.0019944574632973e-07,
+      "mae_cd": 0.00031059980392456055,
+      "r2_cd": 0.9999431371688843,
+      "mse_cl": 5.177103957976215e-06,
+      "mae_cl": 0.001346855191513896,
+      "r2_cl": 0.9999694228172302,
+      "mse_ld_ratio": 1.0114011956829927e-06,
+      "mae_ld_ratio": 0.000644092564471066,
+      "r2_ld_ratio": 0.9999868273735046,
+      "physics_violations": 0,
+      "total_mse": 2.162901409974438e-06
+    },
+    "test_eval": {
+      "mse_cd": 0.0001761335734045133,
+      "mae_cd": 0.007577061653137207,
+      "r2_cd": 0.9222526550292969,
+      "mse_cl": 0.008892632089555264,
+      "mae_cl": 0.06714125722646713,
+      "r2_cl": 0.8710044622421265,
+      "mse_ld_ratio": 0.0023885720875114202,
+      "mae_ld_ratio": 0.037315163761377335,
+      "r2_ld_ratio": 0.9013485908508301,
+      "physics_violations": 0,
+      "total_mse": 0.003819112665951252
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/pinn_latest.pt",
+    "timestamp": "2026-03-31 02:31:53"
+  },
+  {
+    "model": "pinn",
+    "model_kwargs": {
+      "epochs": 2000,
+      "physics_weight": 0.2
+    },
+    "data_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/results/sweep_all.json",
+    "n_samples": 32,
+    "n_train": 25,
+    "n_test": 7,
+    "train_metrics": {
+      "train_time_s": 7.139226913452148,
+      "train_mse": 4.882931989413919e-06,
+      "epochs": 2000,
+      "device": "mps"
+    },
+    "train_eval": {
+      "mse_cd": 5.737161146157632e-08,
+      "mae_cd": 0.00014032363833393902,
+      "r2_cd": 0.9999891519546509,
+      "mse_cl": 2.076239837833782e-07,
+      "mae_cl": 0.0003360748232807964,
+      "r2_cl": 0.9999987483024597,
+      "mse_ld_ratio": 8.719707977888902e-08,
+      "mae_ld_ratio": 0.00024690627469681203,
+      "r2_ld_ratio": 0.9999988675117493,
+      "physics_violations": 0,
+      "total_mse": 1.173975547885675e-07
+    },
+    "test_eval": {
+      "mse_cd": 0.00021298881620168686,
+      "mae_cd": 0.008149845525622368,
+      "r2_cd": 0.9059843420982361,
+      "mse_cl": 0.01052530575543642,
+      "mae_cl": 0.06902129203081131,
+      "r2_cl": 0.847321093082428,
+      "mse_ld_ratio": 0.0024223835207521915,
+      "mae_ld_ratio": 0.03661084175109863,
+      "r2_ld_ratio": 0.8999521136283875,
+      "physics_violations": 0,
+      "total_mse": 0.004386892542243004
+    },
+    "model_path": "/Users/shubh-trips/Documents/personal-project/domain-specific/f1/f1-design-ai/ml/models/pinn_latest.pt",
+    "timestamp": "2026-03-31 02:32:00"
+  }
+]
