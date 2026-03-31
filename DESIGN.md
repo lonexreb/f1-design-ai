@@ -1,5 +1,13 @@
 # Design Decisions & Architecture
 
+## Deployment Philosophy
+
+- **Chosen**: Local-first CLI pipeline
+- **Alternatives**: Web app, hybrid (local compute + web UI), cloud-native (Kubernetes)
+- **Rationale**: CFD and ML workloads require local GPU access. CLI keeps architecture simple with no auth, networking, or infrastructure overhead. Single-user workflow fits the research/optimization use case.
+- **Future**: Optional lightweight dashboard (Streamlit or Plotly Dash) for visualizing parameter sweeps and experiment results. Not a priority until the core pipeline produces real CFD data.
+- **NOT building**: Multi-user web application, cloud job queue, Kubernetes deployment, REST API.
+
 ## Pipeline Flow
 
 ```
@@ -57,6 +65,10 @@ Each backend returns a compatible `SimulationResult`. If the chosen backend fail
 - **Rationale**: Well-characterized, easy to parameterize. 12% thickness (front wing), 10% (rear main), 8% (DRS flap).
 - **Trade-off**: Real F1 wings use custom multi-element profiles optimized for specific conditions.
 
+### Blender API compatibility
+- STL export uses runtime detection: `bpy.ops.wm.stl_export` (Blender 5.x) with fallback to `bpy.ops.export_mesh.stl` (Blender 4.x)
+- No version pinning required — works across both major versions
+
 ### Single combined STL for OpenFOAM
 - **Chosen**: Export all geometry as `f1_car_combined.stl`, single "car" patch
 - **Alternatives**: Per-component STLs with separate patch names
@@ -86,6 +98,13 @@ Each serves a different purpose in the pipeline:
 - **Acquisition functions**: Max variance (explore uncertain regions) or UCB (balance exploit/explore)
 - **Rationale**: With only 32 data points, each new CFD simulation is expensive. GP uncertainty tells us where the model is most wrong, so we simulate there next.
 - **Trade-off**: GP scales O(n^3) with dataset size. Fine for <500 points, need sparse GP beyond that.
+- **Empirical finding (2026-03-31)**: GP has near-perfect Cd prediction (R²=0.998) but poor Cl/L/D generalization (R²~0.5) on 7-point test set. Still the right choice for active learning (uncertainty estimates), but PINN should be the primary surrogate for predictions.
+
+### PINN as primary surrogate (validated 2026-03-31)
+- **Finding**: PINN outperforms all other models at 32 points with balanced R² of 0.85-0.92 across Cd, Cl, L/D
+- **Why it wins**: Physics constraints prevent overfitting that plagues MLP/Linear/GP on Cl and L/D with small datasets
+- **Best config**: physics_weight=0.05, 1000 epochs (test MSE=0.0038) — slightly better than default physics_weight=0.1
+- **Implication**: For the `--backend surrogate` fallback, PINN should be preferred over GP for prediction quality. GP should still drive active learning (uncertainty estimates).
 
 ### Modulus PINN physics constraints
 Six constraints enforced via physics loss in `scripts/modulus_surrogate.py`:
@@ -186,3 +205,37 @@ Max global cells: 5 million.
 - 2nd-order velocity (linearUpwind), 1st-order turbulence (upwind for stability)
 - Convergence: all residuals < 1e-5, max 2000 iterations
 - Force monitoring: Cd, Cl, pressure coefficient, y+ every iteration
+
+## README Accuracy (as of 2026-03-31)
+
+README.md is significantly outdated and does not reflect the current project state:
+
+| README Claims | Reality |
+|---|---|
+| OpenClaw orchestrates the pipeline | OpenClaw not implemented; `run_pipeline.py` is the orchestrator |
+| `export_stl.py` exists | Does not exist; Blender script exports STL directly |
+| `postprocessing/` directory | Does not exist; no ParaView automation yet |
+| `docs/` directory | Does not exist; research docs are DESIGN.md, RESEARCH.md, EXPERIMENT.md |
+| Directory shows only scripts/, blender/, openfoam/ | Missing: ml/, omniverse/, config.yaml, requirements.txt, all .md docs |
+| FreeCAD + CfdOF listed as tool | Not used anywhere in the project |
+| Quick start: `run_pipeline.py --sweeps ride_height,wing_angle` | Actual syntax: `--sweeps ride_height` or `--sweeps all` |
+
+**Decision**: README should be rewritten to match CLAUDE.md as the source of truth. Priority: P1.3 in NEXT-TO-DO.md.
+
+## Known Technical Debt
+
+| Debt | Impact | Priority |
+|---|---|---|
+| config.yaml disconnected from ml/ modules | Parameter bounds duplicated in config.yaml and data_prep.py; drift risk | P2 |
+| Empirical model missing Cd sensitivities | ride_height, diffuser, sidepod don't affect Cd (physically wrong) | P6 |
+| No wing stall modeling | Overpredicts performance at extreme angles (>18-20 deg) | P6 |
+| Autoresearch uses 7 fixed experiments | Not LLM-driven; no hypothesis generation per iteration | P3 |
+| Active learning and autoresearch are separate workflows | Should be one unified loop: improve model + choose next simulation | P4 |
+| All 32 data points are empirical | No CFD validation yet; surrogates trained on estimates only | P1 |
+
+## Device Support
+
+The pipeline supports three compute backends for ML training:
+- **CUDA** — NVIDIA GPUs (primary target for Modulus PINN and large MLP training)
+- **MPS** — Apple Silicon GPUs (added 2026-03-31 for ModulusSurrogate; MLPSurrogate already had MPS support)
+- **CPU** — Fallback for all model types

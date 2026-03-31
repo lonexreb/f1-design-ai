@@ -30,7 +30,12 @@ vendor/
 __pycache__/
 *.pyc
 .venv/
+venv/
 *.egg-info/
+
+# ML model artifacts (large binary files)
+ml/models/*.pkl
+ml/models/*.pt
 
 # OS
 .DS_Store

@@ -1,5 +1,7 @@
 # Research References & Directions
 
+> **Last reviewed**: 2026-03-31 | **Data status**: 32 empirical points, 0 CFD runs | **Best surrogate**: PINN (test MSE=0.0038, R² 0.85-0.92 across all targets)
+
 ## Core References
 
 ### Ravelli & Savini (2018) - "Aerodynamic Simulation of a 2017 F1 Car with Open-Source CFD"
@@ -121,8 +123,33 @@ OpenClaw provides the sandboxed execution environment; autoresearch provides the
 - Cross-variable interaction terms (ride_height x diffuser_angle is dominant)
 - Aero balance modeling (front vs rear downforce split)
 
+### Medium-term: Rewrite README.md
+- README.md is significantly outdated (see DESIGN.md "README Accuracy" section)
+- Should reflect the actual multi-backend pipeline, ML surrogate stack, and documentation structure
+- Use CLAUDE.md as source of truth for directory structure and commands
+
 ### Long-term: Autonomous design agent (OpenClaw)
 - OpenClaw/NemoClaw sandbox with F1 tool manifest
 - Agent reads `research_directions.md`, proposes experiments, runs simulations, evaluates, loops
 - Circuit-specific optimization profiles (Monaco vs Monza)
 - Integration with structural analysis for weight/stiffness constraints
+
+---
+
+## Codebase Health (2026-03-31)
+
+| Metric | Value |
+|---|---|
+| Core pipeline code | ~1,850 lines Python |
+| ML pipeline code | ~1,700 lines Python |
+| Configuration | 149 lines YAML |
+| Documentation | ~5,500 lines across 5 Markdown files |
+| Total tracked codebase | ~9,200 lines |
+| Empirical data points | 32 (sweep_all.json) |
+| CFD-validated data points | 0 |
+| Trained ML models | 4 (PINN 179KB, MLP 48KB, GP 13KB, Linear 2KB — all trained on empirical data) |
+| Autoresearch experiments | 11 completed (4 baseline + 3 MLP HP + 2 Linear HP + 2 PINN HP) |
+| Best test MSE | 0.0038 (PINN, physics_weight=0.05) |
+| Physics violations | 0 across all 11 experiments |
+| Test coverage | 0% (no tests exist) |
+| Git commits | ~10 (initial + Omniverse/ML integration + review fixes) |

@@ -457,7 +457,12 @@ class ModulusSurrogate(SurrogateModel):
 
         import torch
 
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        if torch.cuda.is_available():
+            device = "cuda"
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            device = "mps"
+        else:
+            device = "cpu"
         self._device = device
 
         X_t = torch.tensor(X, dtype=torch.float32, device=device)
@@ -499,7 +504,14 @@ class ModulusSurrogate(SurrogateModel):
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         import torch
-        device = getattr(self, "_device", "cuda" if torch.cuda.is_available() else "cpu")
+        if hasattr(self, "_device"):
+            device = self._device
+        elif torch.cuda.is_available():
+            device = "cuda"
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            device = "mps"
+        else:
+            device = "cpu"
         self._net.model.eval()
         with torch.no_grad():
             X_t = torch.tensor(X, dtype=torch.float32, device=device)

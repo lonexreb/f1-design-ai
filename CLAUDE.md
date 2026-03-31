@@ -88,7 +88,7 @@ Bounds defined in both `config.yaml` (truth source) and `ml/data_prep.py` (hard-
 | Linear | `LinearSurrogate` | Fast, interpretable, polynomial features | Baseline comparison |
 | MLP | `MLPSurrogate` | Captures nonlinearity, PyTorch + CUDA | General purpose |
 | GP | `GPSurrogate` | Uncertainty estimates, GPyTorch/sklearn dual backend | Active learning |
-| PINN | `ModulusSurrogate` | Physics constraints (Cd>0, Cl<0, range bounds) | Physics-informed |
+| PINN | `ModulusSurrogate` | Physics constraints (Cd>0, Cl<0, range bounds) | **Best overall** (R² 0.85-0.92 at 32pts) |
 
 ## Code Conventions
 
@@ -105,10 +105,10 @@ Bounds defined in both `config.yaml` (truth source) and `ml/data_prep.py` (hard-
 - **No CFD runs completed** - all 32 results in sweep_all.json are empirical estimates
 - **OpenClaw/NemoClaw AI orchestration** - referenced in README but no code exists
 - **config.yaml is disconnected** - ml/ modules use hard-coded values, not config.yaml
-- **Autoresearch limited** - manual loop runs only 7 hard-coded HP experiments; no LLM-driven hypothesis generation yet
+- **Autoresearch ran but limited** - 11 experiments completed (see EXPERIMENT.md); manual loop with 7 hard-coded HP experiments; no LLM-driven hypothesis generation yet
 - **Active learning + autoresearch disconnected** - parallel workflows that should be unified
 - **Warp LBM solver** - placeholder in omniverse_sim.py (returns None)
-- **export_stl.py, postprocessing/, docs/** - listed in README but don't exist
+- **README.md is significantly outdated** - references non-existent files (export_stl.py, postprocessing/, docs/), describes OpenClaw as if implemented, architecture diagram shows only OpenClaw orchestration (not the actual multi-backend pipeline), directory structure is missing ml/, omniverse/, config.yaml, and all documentation files
 - No tests, no CI/CD, no web UI
 - No multi-variable interaction sweeps
 

@@ -651,30 +651,46 @@ def export_stl(output_dir):
     """Export each component as individual STL and one combined STL."""
     os.makedirs(output_dir, exist_ok=True)
 
+    # Detect STL export API (changed in Blender 5.x)
+    has_new_api = hasattr(bpy.ops.wm, "stl_export")
+
     # Export individual components
     for obj in bpy.context.scene.objects:
         if obj.type == "MESH":
-            # Select only this object
             bpy.ops.object.select_all(action="DESELECT")
             obj.select_set(True)
             bpy.context.view_layer.objects.active = obj
 
             filepath = os.path.join(output_dir, f"{obj.name}.stl")
-            bpy.ops.export_mesh.stl(
-                filepath=filepath,
-                use_selection=True,
-                ascii=False,
-            )
+            if has_new_api:
+                bpy.ops.wm.stl_export(
+                    filepath=filepath,
+                    export_selected_objects=True,
+                    ascii_format=False,
+                )
+            else:
+                bpy.ops.export_mesh.stl(
+                    filepath=filepath,
+                    use_selection=True,
+                    ascii=False,
+                )
             print(f"  Exported: {filepath}")
 
     # Export combined
     bpy.ops.object.select_all(action="SELECT")
     combined_path = os.path.join(output_dir, "f1_car_combined.stl")
-    bpy.ops.export_mesh.stl(
-        filepath=combined_path,
-        use_selection=True,
-        ascii=False,
-    )
+    if has_new_api:
+        bpy.ops.wm.stl_export(
+            filepath=combined_path,
+            export_selected_objects=True,
+            ascii_format=False,
+        )
+    else:
+        bpy.ops.export_mesh.stl(
+            filepath=combined_path,
+            use_selection=True,
+            ascii=False,
+        )
     print(f"  Exported combined: {combined_path}")
 
 

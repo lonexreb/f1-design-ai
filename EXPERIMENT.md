@@ -163,6 +163,42 @@ python3 -m ml.autoresearch_config run
 
 **Limitation**: These are hand-crafted, not LLM-driven. See NEXT-TO-DO.md P3.
 
+### Autoresearch Results (2026-03-31)
+
+11 experiments completed. All models trained on 25 points, tested on 7. Source: `autoresearch/experiment_log.json`.
+
+#### Baseline Model Comparison (default hyperparameters)
+
+| Model | Test R² Cd | Test R² Cl | Test R² L/D | Test MSE | Train Time |
+|---|---|---|---|---|---|
+| **PINN** | **0.910** | **0.854** | **0.905** | **0.0042** | 8.0s (MPS) |
+| GP | **0.998** | 0.567 | 0.511 | 0.0139 | 0.5s (CPU) |
+| MLP | 0.931 | 0.021 | -1.482 | 0.0426 | 0.2s (CPU) |
+| Linear | 0.760 | -0.074 | -1.830 | 0.0477 | 0.002s (CPU) |
+
+**Key finding: PINN is the clear winner.** Best balanced R² across all three targets (0.85-0.91). GP excels at Cd but fails at Cl/L/D. MLP and Linear both have negative R² on L/D (worse than predicting the mean).
+
+#### Hyperparameter Variations
+
+| Experiment | Test R² Cd | Test R² Cl | Test R² L/D | Test MSE |
+|---|---|---|---|---|
+| PINN physics_weight=0.05, 1000ep | 0.922 | 0.871 | 0.901 | **0.0038** (best) |
+| PINN physics_weight=0.2, 2000ep | 0.906 | 0.847 | 0.900 | 0.0044 |
+| MLP [128,128,64] lr=0.0005, 800ep | 0.946 | 0.370 | -0.552 | 0.0270 |
+| Linear degree=3, alpha=1.0 | 0.806 | 0.063 | -1.809 | 0.0444 |
+| Linear degree=2, alpha=0.1 | 0.950 | 0.002 | -2.267 | 0.0493 |
+| MLP [64,64,64,32] 500ep | 0.893 | -0.314 | -2.855 | 0.0614 |
+| MLP [32,32] 300ep | 0.111 | -0.712 | -1.999 | 0.0642 |
+
+#### Insights from Autoresearch
+
+1. **Physics constraints are critical at 32 points** — PINN's physics loss prevents the overfitting that plagues all other models on Cl and L/D
+2. **Lower physics_weight (0.05) slightly outperforms default (0.1) and higher (0.2)** — physics should guide, not dominate
+3. **GP overfits on Cd but generalizes poorly on Cl/L/D** — the 7-point test set exposes GP's weakness in extrapolating correlated outputs
+4. **MLP architecture matters but doesn't fix the fundamental issue** — [128,128,64] is best MLP but still has negative L/D R²
+5. **All 11 experiments had 0 physics violations** — no model predicted Cd<0 or Cl>0
+6. **PINN used Apple Silicon MPS** — 8s training (MPS) vs 0.2s (MLP on CPU), acceptable given far superior accuracy
+
 ### Model Comparison Metrics
 Run via: `python3 -m ml.experiment --model all --data results/sweep_all.json`
 
@@ -204,10 +240,11 @@ python3 -m ml.active_learning --iterations 3
 - Max downforce config: ride_height=25mm, fw=20 deg, rw=22 deg, diff=14 deg
 - Purpose: calibrate surrogate models at design space boundaries
 
-### Next: ML Model Comparison on Empirical Data
-- Run autoresearch on current 32-point dataset
-- Establish which model type performs best with limited data
-- Expected: GP should dominate at 32 points; MLP needs more data
+### ~~Next: ML Model Comparison on Empirical Data~~ DONE (2026-03-31)
+- ~~Run autoresearch on current 32-point dataset~~
+- ~~Establish which model type performs best with limited data~~
+- **Result**: PINN dominates, not GP as expected. Physics constraints matter more than uncertainty at 32 points.
+- See "Autoresearch Results" section above for full data.
 
 ### Future: Active Learning with CFD
 - Train GP on initial 32 empirical + N CFD points
