@@ -183,7 +183,8 @@ Specific features modeled:
 - Height: 20m (~21 car heights) - prevents artificial acceleration
 
 ### Mesh Refinement Strategy
-Five refinement regions by aerodynamic importance:
+
+**Target (production) mesh** — 5 refinement regions by aerodynamic importance:
 1. **Car surface** (level 5): Captures geometry detail
 2. **Feature edges** (level 5): Sharp edges, trailing edges
 3. **Near-car box** (level 3): -4m to 6m X, -2m to 2m Y - overall flow field
@@ -191,6 +192,12 @@ Five refinement regions by aerodynamic importance:
 5. **Base mesh**: 60x20x15 cells (coarse structured)
 
 Max global cells: 5 million.
+
+**Current (first-run) mesh** — simplified for pipeline validation:
+- addLayers disabled, max 2M cells, surface level 2-3, edge level 3
+- Only 2 refinement regions (near-car level 1, wake level 1)
+- Underbody, front wing, and rear wing region boxes removed
+- Purpose: fast turnaround to validate Blender -> mesh -> solve -> extract chain before investing in resolution
 
 ### Boundary Conditions
 - **Inlet**: Fixed velocity 83.33 m/s (300 km/h), turbulence intensity ~0.5%
@@ -220,7 +227,7 @@ README.md is significantly outdated and does not reflect the current project sta
 | FreeCAD + CfdOF listed as tool | Not used anywhere in the project |
 | Quick start: `run_pipeline.py --sweeps ride_height,wing_angle` | Actual syntax: `--sweeps ride_height` or `--sweeps all` |
 
-**Decision**: README should be rewritten to match CLAUDE.md as the source of truth. Priority: P1.3 in NEXT-TO-DO.md.
+**Resolution**: README.md rewritten 2026-03-31 to match CLAUDE.md as source of truth. P1.3 complete.
 
 ## Known Technical Debt
 

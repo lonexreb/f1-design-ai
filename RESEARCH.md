@@ -152,4 +152,4 @@ OpenClaw provides the sandboxed execution environment; autoresearch provides the
 | Best test MSE | 0.0038 (PINN, physics_weight=0.05) |
 | Physics violations | 0 across all 11 experiments |
 | Test coverage | 0% (no tests exist) |
-| Git commits | ~10 (initial + Omniverse/ML integration + review fixes) |
+| Git commits | 12 (initial + Omniverse/ML integration + review fixes + compat + docs) |

@@ -14,10 +14,10 @@ _Nothing else matters until the Blender -> simulation -> results chain actually 
 - Compare Cd/Cl against empirical estimates (Cd=0.95, Cl=-3.5)
 - Document wall time and mesh cell count
 
-### 1.3 Fix README accuracy
-- Remove references to non-existent files: `export_stl.py`, `postprocessing/`, `docs/`
-- Clarify OpenClaw is aspirational, not implemented
-- Update directory structure to match reality (add ml/, omniverse/, config.yaml)
+### ~~1.3 Fix README accuracy~~ DONE (2026-03-31)
+- ~~Remove references to non-existent files~~ README fully rewritten
+- ~~Clarify OpenClaw is aspirational~~ Removed from README architecture
+- ~~Update directory structure~~ Now matches actual project layout
 
 ---
 
@@ -53,10 +53,11 @@ _Current manual loop runs 7 fixed experiments. Karpathy's pattern needs LLM-driv
 - Specifies: current objective, constraints, what to explore, what to avoid
 - Agent reads every iteration (can be updated mid-run)
 
-### 3.3 Scale experiment count
-- Replace 7 fixed experiments with configurable `--iterations N`
+### 3.3 Scale experiment count (partially done)
+- ~~Replace 7 fixed experiments with configurable `--iterations N`~~ 11 experiments ran via manual loop
 - Add time budget per experiment (like autoresearch's 5-minute fixed budget)
 - Add early stopping when improvements plateau
+- **Result**: PINN is best model (test MSE=0.0038). See EXPERIMENT.md for full results.
 
 ---
 

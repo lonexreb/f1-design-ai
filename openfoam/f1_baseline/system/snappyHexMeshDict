@@ -19,7 +19,7 @@ FoamFile
 
 castellatedMesh true;
 snap            true;
-addLayers       true;
+addLayers       false;  // Disabled for first run (coarse mesh)
 
 mergeTolerance  1e-6;
 
@@ -34,17 +34,17 @@ geometry
 
 castellatedMeshControls
 {
-    maxLocalCells       1000000;
-    maxGlobalCells      5000000;
+    maxLocalCells       500000;
+    maxGlobalCells      2000000;
     minRefinementCells  10;
     maxLoadUnbalance    0.10;
-    nCellsBetweenLevels 3;
+    nCellsBetweenLevels 2;
 
     features
     (
         {
             file        "f1_car_combined.eMesh";
-            level       5;      // Fine refinement at edges
+            level       3;      // Edge refinement (reduced for first run)
         }
     );
 
@@ -52,7 +52,7 @@ castellatedMeshControls
     {
         car
         {
-            level       (4 5);  // Min/max surface refinement
+            level       (2 3);  // Min/max surface refinement (reduced for first run)
             patchInfo
             {
                 type    wall;
@@ -65,54 +65,23 @@ castellatedMeshControls
     refinementRegions
     {
         // Near-car refinement box
-        // Captures wake, underbody flow, and wing interactions
         refinementBox_near
         {
             mode    inside;
             type    searchableBox;
             min     (-4 -2 0);
             max     (6 2 2);
-            level   3;
+            level   1;
         }
 
-        // Wake region (extended downstream)
+        // Wake region
         refinementBox_wake
         {
             mode    inside;
             type    searchableBox;
             min     (3 -1.5 0);
             max     (15 1.5 1.5);
-            level   2;
-        }
-
-        // Underbody region (critical for ground effect)
-        refinementBox_underbody
-        {
-            mode    inside;
-            type    searchableBox;
-            min     (-3 -1 0);
-            max     (4 1 0.15);
-            level   5;      // Extra fine for ground effect
-        }
-
-        // Front wing region
-        refinementBox_frontwing
-        {
-            mode    inside;
-            type    searchableBox;
-            min     (-3.0 -1.2 0);
-            max     (-2.0 1.2 0.3);
-            level   5;
-        }
-
-        // Rear wing + diffuser region
-        refinementBox_rearwing
-        {
-            mode    inside;
-            type    searchableBox;
-            min     (2.0 -0.8 0);
-            max     (3.5 0.8 1.2);
-            level   5;
+            level   1;
         }
     }
 

@@ -145,13 +145,15 @@ python3 -m ml.autoresearch_config run
 **Experiment log format** (`autoresearch/experiment_log.json`):
 ```json
 {
-  "experiment_id": 1,
-  "model": "gp",
-  "hyperparameters": {"kernel": "matern25", "n_restarts": 10},
-  "metrics": {"r2_cd": 0.85, "r2_cl": 0.92, "r2_ld": 0.88, "mse_total": 0.012},
-  "physics_violations": 0,
-  "training_time_s": 1.2,
-  "status": "success"
+  "model": "pinn",
+  "model_kwargs": {"epochs": 1000, "physics_weight": 0.05},
+  "data_path": "results/sweep_all.json",
+  "n_samples": 32, "n_train": 25, "n_test": 7,
+  "train_metrics": {"train_time_s": 4.03, "train_mse": 3.77e-05, "epochs": 1000, "device": "mps"},
+  "train_eval": {"r2_cd": 0.999, "r2_cl": 0.999, "r2_ld_ratio": 0.999, "physics_violations": 0},
+  "test_eval": {"r2_cd": 0.922, "r2_cl": 0.871, "r2_ld_ratio": 0.901, "total_mse": 0.0038},
+  "model_path": "ml/models/pinn_latest.pt",
+  "timestamp": "2026-03-31 02:31:53"
 }
 ```
 
