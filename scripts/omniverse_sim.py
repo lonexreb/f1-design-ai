@@ -204,13 +204,19 @@ def run_omniverse_flow(scene_config: dict) -> Optional[dict]:
     """
     Execute Omniverse Flow CFD simulation.
     Returns force coefficients dict or None on failure.
+
+    NOTE: The omni.flow Python API below is a placeholder interface.
+    NVIDIA Omniverse Flow configuration is currently done via USD prim
+    attributes (omni.usd / pxr.Usd), not a high-level Solver class.
+    This stub will be updated when the actual SDK integration is available.
+    In practice, the ImportError path (_run_flow_via_kit) is taken.
     """
     try:
         import omni.flow as flow
     except ImportError:
         return _run_flow_via_kit(scene_config)
 
-    # Direct API path (when omni.flow is available)
+    # Placeholder API path (omni.flow high-level Solver is not yet public)
     solver = flow.Solver()
     solver.load_scene(scene_config["usd_path"])
     solver.set_domain(**scene_config["domain"])

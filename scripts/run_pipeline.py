@@ -455,14 +455,52 @@ def run_surrogate(params: SimulationParams) -> SimulationResult:
             print(f"  Warning: could not load target stats for destandardization: {e}")
             traceback.print_exc()
 
-    # Try loading models in priority order (GP saves as .pt with GPyTorch)
-    model_candidates = [
+    # Build candidate list: all known model artifacts
+    all_candidates = [
         (MODELS_DIR / "gp_latest.pt", GPSurrogate),
         (MODELS_DIR / "gp_latest.pkl", GPSurrogate),
         (MODELS_DIR / "mlp_latest.pt", MLPSurrogate),
         (MODELS_DIR / "pinn_latest.pt", ModulusSurrogate),
         (MODELS_DIR / "linear_latest.pkl", LinearSurrogate),
     ]
+
+    # Try to rank by experiment metrics (best test R² first)
+    experiment_path = RESULTS_DIR / "experiment.json"
+    model_candidates = all_candidates  # default: static priority order
+    if experiment_path.exists():
+        try:
+            exp_data = json.loads(experiment_path.read_text())
+            if isinstance(exp_data, list):
+                # Sort by average test R² (descending), skip errored entries
+                ranked = sorted(
+                    [e for e in exp_data if "test_eval" in e],
+                    key=lambda e: (
+                        e["test_eval"].get("r2_cd", 0)
+                        + e["test_eval"].get("r2_cl", 0)
+                        + e["test_eval"].get("r2_ld_ratio", 0)
+                    ) / 3.0,
+                    reverse=True,
+                )
+                if ranked:
+                    # Rebuild candidate list in ranked order
+                    name_to_paths = {}
+                    for path, cls in all_candidates:
+                        name_to_paths.setdefault(cls.name, []).append((path, cls))
+                    ordered = []
+                    seen = set()
+                    for entry in ranked:
+                        model_name = entry["model"]
+                        if model_name in name_to_paths and model_name not in seen:
+                            ordered.extend(name_to_paths[model_name])
+                            seen.add(model_name)
+                    # Append any remaining candidates not in experiment results
+                    for path, cls in all_candidates:
+                        if cls.name not in seen:
+                            ordered.append((path, cls))
+                            seen.add(cls.name)
+                    model_candidates = ordered
+        except Exception:
+            pass  # Fall back to static priority order
 
     for model_path, model_cls in model_candidates:
         if model_path.exists():

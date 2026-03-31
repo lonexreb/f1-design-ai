@@ -405,8 +405,8 @@ class GPSurrogate(SurrogateModel):
             n_features = data.get("n_features", 5)
 
             # Reconstruct GP models from saved state dicts
-            dummy_x = torch.zeros(n_train, n_features)
-            dummy_y = torch.zeros(n_train)
+            dummy_x = torch.zeros(n_train, n_features, device=self._device)
+            dummy_y = torch.zeros(n_train, device=self._device)
 
             self.models = []
             self.likelihoods = []
