@@ -132,20 +132,22 @@ def run_simulation(params: dict, backend: str = "estimate") -> dict:
     )
 
     if backend == "omniverse":
-        from omniverse_sim import run_omniverse_cfd
-        result = run_omniverse_cfd(sim_params)
-        if result:
-            return {
-                "params": params,
-                "cd": result["cd"],
-                "cl": result["cl"],
-                "ld_ratio": result["ld_ratio"],
-                "converged": result.get("converged", False),
-                "iterations": result.get("iterations", 0),
-                "wall_time_s": result.get("wall_time_s", 0),
-                "notes": "Active learning - Omniverse CFD",
-            }
-        print("  Omniverse not available, falling back to empirical estimate")
+        try:
+            from omniverse_sim import run_omniverse_cfd
+            result = run_omniverse_cfd(sim_params)
+            if result:
+                return {
+                    "params": params,
+                    "cd": result["cd"],
+                    "cl": result["cl"],
+                    "ld_ratio": result["ld_ratio"],
+                    "converged": result.get("converged", False),
+                    "iterations": result.get("iterations", 0),
+                    "wall_time_s": result.get("wall_time_s", 0),
+                    "notes": "Active learning - Omniverse CFD",
+                }
+        except (ImportError, Exception) as e:
+            print(f"  Omniverse backend failed ({e}), falling back to empirical estimate")
 
     if backend == "openfoam":
         from run_pipeline import run_blender, find_blender, run_openfoam, find_openfoam, extract_results
@@ -175,19 +177,22 @@ def run_simulation(params: dict, backend: str = "estimate") -> dict:
             print(f"  OpenFOAM not available ({e}), falling back to empirical estimate")
 
     if backend == "modulus":
-        from modulus_surrogate import predict_modulus
-        result = predict_modulus(params)
-        if result:
-            return {
-                "params": params,
-                "cd": result["cd"],
-                "cl": result["cl"],
-                "ld_ratio": result["ld_ratio"],
-                "converged": True,
-                "iterations": 0,
-                "wall_time_s": 0.001,
-                "notes": "Active learning - Modulus PINN",
-            }
+        try:
+            from modulus_surrogate import predict_modulus
+            result = predict_modulus(params)
+            if result:
+                return {
+                    "params": params,
+                    "cd": result["cd"],
+                    "cl": result["cl"],
+                    "ld_ratio": result["ld_ratio"],
+                    "converged": True,
+                    "iterations": 0,
+                    "wall_time_s": 0.001,
+                    "notes": "Active learning - Modulus PINN",
+                }
+        except (ImportError, Exception) as e:
+            print(f"  Modulus backend failed ({e}), falling back to empirical estimate")
 
     # Empirical estimate fallback
     result = estimate_coefficients(sim_params)

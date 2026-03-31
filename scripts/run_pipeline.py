@@ -677,7 +677,8 @@ def main():
                 al_backend = "estimate"
             data_path = str(RESULTS_DIR / "sweep_all.json")
             active_learning_loop(data_path, n_iterations=args.active_learn,
-                                 backend=al_backend)
+                                 backend=al_backend,
+                                 output_path=data_path)
         except Exception as e:
             print(f"  ERROR: {e}")
             traceback.print_exc()
