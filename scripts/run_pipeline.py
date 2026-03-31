@@ -509,9 +509,11 @@ def run_with_backend(params: SimulationParams, backend: str,
         return estimate_coefficients(params)
     else:  # openfoam (default)
         if blender_cmd:
-            run_blender(params, blender_cmd)
+            if not run_blender(params, blender_cmd):
+                print("  WARNING: Blender geometry generation failed")
         if of_cmds:
-            run_openfoam(of_cmds)
+            if not run_openfoam(of_cmds):
+                raise RuntimeError("OpenFOAM simulation failed; cannot extract results")
         return extract_results(params)
 
 
@@ -667,9 +669,14 @@ def main():
         try:
             sys.path.insert(0, str(ML_DIR.parent))
             from ml.active_learning import active_learning_loop
+            al_backend = args.backend
+            al_valid = ("omniverse", "openfoam", "modulus", "estimate")
+            if al_backend not in al_valid:
+                print(f"  Backend '{al_backend}' not supported for active learning, using 'estimate'")
+                al_backend = "estimate"
             data_path = str(RESULTS_DIR / "sweep_all.json")
             active_learning_loop(data_path, n_iterations=args.active_learn,
-                                 backend=args.backend)
+                                 backend=al_backend)
         except Exception as e:
             print(f"  ERROR: {e}")
             traceback.print_exc()

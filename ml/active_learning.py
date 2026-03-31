@@ -215,6 +215,13 @@ def active_learning_loop(data_path: str, n_iterations: int = 5,
     Returns:
         List of all results (original + new)
     """
+    valid_backends = ("omniverse", "openfoam", "modulus", "estimate")
+    if backend not in valid_backends:
+        raise ValueError(
+            f"Invalid backend '{backend}' for active learning. "
+            f"Supported: {', '.join(valid_backends)}"
+        )
+
     print("=" * 60)
     print(f"  Active Learning Loop ({n_iterations} iterations)")
     print(f"  Backend: {backend} | Acquisition: {acquisition}")

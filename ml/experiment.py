@@ -129,7 +129,7 @@ def run_experiment(model_name: str, data_path: str,
     # Save model
     model_path = None
     if save_model:
-        ext = ".pkl" if model_name == "linear" else ".pt"
+        ext = ".pkl" if model_name in ("linear", "gp") else ".pt"
         model_path = PROJECT_DIR / "ml" / "models" / f"{model_name}_latest{ext}"
         model.save(model_path)
         print(f"  Model saved: {model_path}")

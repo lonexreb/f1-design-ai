@@ -215,7 +215,7 @@ class MLPSurrogate(SurrogateModel):
 
     def load(self, path: Path):
         import torch
-        checkpoint = torch.load(str(path), map_location="cpu", weights_only=False)
+        checkpoint = torch.load(str(path), map_location="cpu", weights_only=True)
         self.hidden_layers = checkpoint["hidden_layers"]
         self._build(checkpoint["in_dim"], checkpoint["out_dim"])
         self.model.load_state_dict(checkpoint["model_state"])
@@ -370,9 +370,13 @@ class GPSurrogate(SurrogateModel):
         return np.stack(variances, axis=-1)
 
     def save(self, path: Path):
-        import pickle
+        """Save GP model. Uses .pkl extension for sklearn, .pt for GPyTorch."""
         path.parent.mkdir(parents=True, exist_ok=True)
         if not self._use_gpytorch:
+            import pickle
+            # Ensure sklearn GP saves with .pkl extension
+            if str(path).endswith(".pt"):
+                path = path.with_suffix(".pkl")
             with open(path, "wb") as f:
                 pickle.dump({"models": self.models, "use_gpytorch": False}, f)
         else:
@@ -397,7 +401,7 @@ class GPSurrogate(SurrogateModel):
             # GPyTorch checkpoint saved via torch.save
             import torch
             import gpytorch
-            data = torch.load(path_str, map_location="cpu", weights_only=False)
+            data = torch.load(path_str, map_location="cpu", weights_only=True)
             self._use_gpytorch = True
             self._device = "cuda" if torch.cuda.is_available() else "cpu"
 
