@@ -484,6 +484,10 @@ class ModulusSurrogate(SurrogateModel):
         if best_state is not None:
             self._net.model.load_state_dict(best_state)
         self._net.model.eval()
+
+        # Set y_mean/y_std on the net so save() and predict() work correctly
+        self._net.y_mean = Y.mean(axis=0)
+        self._net.y_std = Y.std(axis=0) + 1e-8
         train_time = time.time() - start
 
         return {

@@ -448,8 +448,9 @@ def run_surrogate(params: SimulationParams) -> SimulationResult:
             data = load_results(data_path)
             _, Y_raw = results_to_arrays(data)
             _, target_stats = standardize_targets(Y_raw)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"  Warning: could not load target stats for destandardization: {e}")
+            traceback.print_exc()
 
     # Try loading models in priority order (GP saves as .pt with GPyTorch)
     model_candidates = [
