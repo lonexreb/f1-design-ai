@@ -252,9 +252,14 @@ def convert_with_pxr(stl_path: Path, usd_path: Path,
         print("  pxr (OpenUSD) not installed, using built-in USDA writer")
         return False
 
+    if with_wind_tunnel:
+        # pxr path doesn't create wind tunnel prims; fall back to built-in writer
+        print("  pxr path does not support wind tunnel prims, using built-in USDA writer")
+        return False
+
     vertices, normals, face_indices, num_triangles = read_stl(stl_path)
     print(f"  Loaded: {num_triangles:,} triangles, {len(vertices):,} vertices")
-    print(f"  Using pxr (OpenUSD) for USD generation...")
+    print("  Using pxr (OpenUSD) for USD generation...")
 
     usd_path.parent.mkdir(parents=True, exist_ok=True)
     stage = Usd.Stage.CreateNew(str(usd_path))

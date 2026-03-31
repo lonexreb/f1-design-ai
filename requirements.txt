@@ -13,7 +13,7 @@ numpy-stl>=3.0
 # === NVIDIA Omniverse / USD ===
 # OpenUSD Python bindings for STL -> USD geometry conversion
 # Note: Omniverse Kit SDK is installed separately via NVIDIA launcher
-usd-core>=23.11
+usd-core>=25.08
 
 # === NVIDIA Modulus (Physics-ML) ===
 # Physics-informed neural networks, Fourier Neural Operators, DeepONet
@@ -21,7 +21,7 @@ usd-core>=23.11
 nvidia-modulus>=0.6.0
 
 # === PyTorch (backend for Modulus + ML surrogates) ===
-torch>=2.1
+torch>=2.6.0
 
 # === ML Surrogate Models ===
 scikit-learn>=1.3        # Baseline models, polynomial features, metrics
@@ -30,7 +30,7 @@ botorch>=0.9             # Bayesian optimization on top of GPyTorch
 
 # === Karpathy's Autoresearch ===
 # Automated ML research: iterative experiment design, execution, improvement
-aresearch
+aresearch>=0.1.0
 
 # === Utilities ===
 pyyaml>=6.0              # Configuration file loading

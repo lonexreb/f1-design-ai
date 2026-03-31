@@ -145,8 +145,29 @@ def run_simulation(params: dict, backend: str = "estimate") -> dict:
                 "wall_time_s": result.get("wall_time_s", 0),
                 "notes": "Active learning - Omniverse CFD",
             }
-        # Fall through to estimate if Omniverse unavailable
         print("  Omniverse not available, falling back to empirical estimate")
+
+    if backend == "openfoam":
+        from run_pipeline import run_blender, find_blender, run_openfoam, find_openfoam, extract_results
+        blender_cmd = find_blender()
+        if blender_cmd:
+            run_blender(sim_params, blender_cmd)
+        try:
+            of_cmds = find_openfoam()
+            run_openfoam(of_cmds)
+            of_result = extract_results(sim_params)
+            return {
+                "params": params,
+                "cd": of_result.cd,
+                "cl": of_result.cl,
+                "ld_ratio": of_result.ld_ratio,
+                "converged": of_result.converged,
+                "iterations": of_result.iterations,
+                "wall_time_s": of_result.wall_time_s,
+                "notes": "Active learning - OpenFOAM CFD",
+            }
+        except (SystemExit, Exception) as e:
+            print(f"  OpenFOAM not available ({e}), falling back to empirical estimate")
 
     if backend == "modulus":
         from modulus_surrogate import predict_modulus
@@ -211,7 +232,7 @@ def active_learning_loop(data_path: str, n_iterations: int = 5,
         # Convert to arrays
         X, Y = results_to_arrays(data)
         X_norm, _ = normalize(X)
-        Y_std, y_stats = standardize_targets(Y)
+        Y_std, _ = standardize_targets(Y)
 
         # Train GP
         print("  Training GP surrogate...")
@@ -228,7 +249,7 @@ def active_learning_loop(data_path: str, n_iterations: int = 5,
         )
 
         uncertainty = proposed.pop("_uncertainty", None)
-        print(f"  Proposed params:")
+        print("  Proposed params:")
         for name, val in proposed.items():
             lo, hi = PARAM_BOUNDS[name]
             pct = (val - lo) / (hi - lo) * 100
@@ -284,7 +305,7 @@ def analyze_uncertainty(data_path: str):
         return
 
     total_unc = uncertainty.sum(axis=1)
-    print(f"\n  Uncertainty statistics:")
+    print("\n  Uncertainty statistics:")
     print(f"    Mean: {total_unc.mean():.4f}")
     print(f"    Max:  {total_unc.max():.4f}")
     print(f"    Min:  {total_unc.min():.4f}")
@@ -293,7 +314,7 @@ def analyze_uncertainty(data_path: str):
     top_idx = np.argsort(total_unc)[-5:][::-1]
     grid_raw = denormalize(grid)
 
-    print(f"\n  Top 5 uncertain parameter regions:")
+    print("\n  Top 5 uncertain parameter regions:")
     for rank, idx in enumerate(top_idx):
         params = grid_raw[idx]
         print(f"    #{rank+1} (unc={total_unc[idx]:.4f}):")

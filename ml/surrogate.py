@@ -294,6 +294,10 @@ class GPSurrogate(SurrogateModel):
             self.models.append(model)
             self.likelihoods.append(likelihood)
 
+        # Store metadata for save/load reconstruction
+        self._n_train = X.shape[0]
+        self._n_features = X.shape[1]
+
         train_time = time.time() - start
 
         return {
@@ -309,6 +313,8 @@ class GPSurrogate(SurrogateModel):
         from sklearn.gaussian_process.kernels import Matern, ConstantKernel
 
         self._use_gpytorch = False
+        self._n_train = X.shape[0]
+        self._n_features = X.shape[1]
         self.models = []
 
         kernel = ConstantKernel() * Matern(nu=2.5)
@@ -366,7 +372,6 @@ class GPSurrogate(SurrogateModel):
     def save(self, path: Path):
         import pickle
         path.parent.mkdir(parents=True, exist_ok=True)
-        # For sklearn models
         if not self._use_gpytorch:
             with open(path, "wb") as f:
                 pickle.dump({"models": self.models, "use_gpytorch": False}, f)
@@ -374,17 +379,60 @@ class GPSurrogate(SurrogateModel):
             import torch
             torch.save({
                 "models": [m.state_dict() for m in self.models],
-                "likelihoods": [l.state_dict() for l in self.likelihoods],
+                "likelihoods": [lh.state_dict() for lh in self.likelihoods],
                 "use_gpytorch": True,
+                "n_train": self._n_train,
+                "n_features": self._n_features,
             }, str(path))
 
     def load(self, path: Path):
-        import pickle
-        with open(path, "rb") as f:
-            data = pickle.load(f)
-        self._use_gpytorch = data.get("use_gpytorch", False)
-        if not self._use_gpytorch:
+        path_str = str(path)
+        if path_str.endswith(".pkl"):
+            import pickle
+            with open(path, "rb") as f:
+                data = pickle.load(f)
+            self._use_gpytorch = False
             self.models = data["models"]
+        else:
+            # GPyTorch checkpoint saved via torch.save
+            import torch
+            import gpytorch
+            data = torch.load(path_str, map_location="cpu", weights_only=False)
+            self._use_gpytorch = True
+            self._device = "cuda" if torch.cuda.is_available() else "cpu"
+
+            n_train = data.get("n_train", 10)
+            n_features = data.get("n_features", 5)
+
+            # Reconstruct GP models from saved state dicts
+            dummy_x = torch.zeros(n_train, n_features)
+            dummy_y = torch.zeros(n_train)
+
+            self.models = []
+            self.likelihoods = []
+            for m_state, lh_state in zip(data["models"], data["likelihoods"]):
+                likelihood = gpytorch.likelihoods.GaussianLikelihood().to(self._device)
+
+                class ExactGP(gpytorch.models.ExactGP):
+                    def __init__(self, train_x, train_y, lh):
+                        super().__init__(train_x, train_y, lh)
+                        self.mean_module = gpytorch.means.ConstantMean()
+                        self.covar_module = gpytorch.kernels.ScaleKernel(
+                            gpytorch.kernels.MaternKernel(nu=2.5)
+                        )
+
+                    def forward(self, x):
+                        return gpytorch.distributions.MultivariateNormal(
+                            self.mean_module(x), self.covar_module(x)
+                        )
+
+                model = ExactGP(dummy_x, dummy_y, likelihood).to(self._device)
+                model.load_state_dict(m_state)
+                likelihood.load_state_dict(lh_state)
+                model.eval()
+                likelihood.eval()
+                self.models.append(model)
+                self.likelihoods.append(likelihood)
 
 
 class ModulusSurrogate(SurrogateModel):
@@ -407,11 +455,10 @@ class ModulusSurrogate(SurrogateModel):
 
         self._net = F1AeroNet(physics_weight=self.physics_weight)
 
-        # F1AeroNet expects raw JSON data path, but we have arrays
-        # Train directly using the model internals
         import torch
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
+        self._device = device
 
         X_t = torch.tensor(X, dtype=torch.float32, device=device)
         Y_t = torch.tensor(Y, dtype=torch.float32, device=device)
@@ -421,6 +468,7 @@ class ModulusSurrogate(SurrogateModel):
 
         start = time.time()
         best_loss = float("inf")
+        best_state = None
 
         for epoch in range(self.epochs):
             optimizer.zero_grad()
@@ -430,9 +478,13 @@ class ModulusSurrogate(SurrogateModel):
             optimizer.step()
             if loss.item() < best_loss:
                 best_loss = loss.item()
+                best_state = {k: v.clone() for k, v in self._net.model.state_dict().items()}
 
-        train_time = time.time() - start
+        # Restore best model state
+        if best_state is not None:
+            self._net.model.load_state_dict(best_state)
         self._net.model.eval()
+        train_time = time.time() - start
 
         return {
             "train_time_s": train_time,
@@ -443,21 +495,21 @@ class ModulusSurrogate(SurrogateModel):
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         import torch
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = getattr(self, "_device", "cuda" if torch.cuda.is_available() else "cpu")
         self._net.model.eval()
         with torch.no_grad():
             X_t = torch.tensor(X, dtype=torch.float32, device=device)
             return self._net.model(X_t).cpu().numpy()
 
     def save(self, path: Path):
-        if self._net:
+        if self._net is not None:
             self._net.save(path)
 
     def load(self, path: Path):
         import sys
         sys.path.insert(0, str(PROJECT_DIR / "scripts"))
         from modulus_surrogate import F1AeroNet
-        self._net = F1AeroNet()
+        self._net = F1AeroNet(physics_weight=self.physics_weight)
         self._net.load(path)
 
 

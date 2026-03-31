@@ -20,6 +20,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -269,30 +270,36 @@ def _run_flow_via_kit(scene_config: dict) -> Optional[dict]:
         print("  WARNING: Omniverse Kit not found for Flow simulation")
         return None
 
-    # Write scene config to temp file for Kit to read
-    config_path = Path("/tmp/f1_flow_config.json")
-    config_path.write_text(json.dumps(scene_config, indent=2))
-
-    # Kit CLI execution with Flow extension
-    cmd = [
-        kit_path,
-        "--enable", "omni.flow",
-        "--exec", f"flow.run_simulation('{config_path}')",
-        "--no-window",
-    ]
+    # Write scene config to secure temp file for Kit to read
+    config_fd, config_path_str = tempfile.mkstemp(suffix=".json", prefix="f1_flow_config_")
+    config_path = Path(config_path_str)
+    results_fd, results_path_str = tempfile.mkstemp(suffix=".json", prefix="f1_flow_results_")
+    results_path = Path(results_path_str)
+    os.close(results_fd)
 
     try:
+        with os.fdopen(config_fd, "w") as f:
+            json.dump(scene_config, f, indent=2)
+
+        # Kit CLI execution with Flow extension
+        cmd = [
+            kit_path,
+            "--enable", "omni.flow",
+            "--exec", f"flow.run_simulation('{config_path}', '{results_path}')",
+            "--no-window",
+        ]
+
         result = subprocess.run(
             cmd, capture_output=True, text=True,
             timeout=7200, cwd=str(PROJECT_DIR)
         )
-        if result.returncode == 0:
-            # Parse results from Kit output
-            results_path = Path("/tmp/f1_flow_results.json")
-            if results_path.exists():
-                return json.loads(results_path.read_text())
+        if result.returncode == 0 and results_path.exists():
+            return json.loads(results_path.read_text())
     except (subprocess.TimeoutExpired, FileNotFoundError) as e:
         print(f"  WARNING: Kit execution failed: {e}")
+    finally:
+        config_path.unlink(missing_ok=True)
+        results_path.unlink(missing_ok=True)
 
     return None
 
@@ -302,40 +309,20 @@ def run_warp_cfd(usd_path: Path, config: OmniverseConfig) -> Optional[dict]:
     Lightweight GPU CFD using NVIDIA Warp.
     Warp provides GPU-accelerated custom physics kernels without
     the full Omniverse Kit dependency. Useful for rapid prototyping.
+
+    NOTE: LBM kernel not yet implemented — returns None to trigger fallback.
     """
     try:
         import warp as wp
-        import numpy as np
     except ImportError:
         print("  WARNING: NVIDIA Warp not available")
         return None
 
-    wp.init()
-    device = f"cuda:{config.gpu_device}"
-
-    print(f"  Running Warp GPU CFD on {device}...")
-    print(f"  Resolution: {config.flow_resolution}")
-
-    # Simplified Lattice Boltzmann Method on GPU via Warp
     res = config.resolution_cells
     nx, ny, nz = res["base"][0] * 4, res["base"][1] * 4, res["base"][2] * 4
 
-    # This is a simplified LBM — for production use, Omniverse Flow
-    # provides higher-fidelity turbulence modeling
-    start_time = time.time()
-
-    # Initialize density and velocity fields
-    rho = wp.zeros((nx, ny, nz), dtype=float, device=device)
-    ux = wp.zeros((nx, ny, nz), dtype=float, device=device)
-    uy = wp.zeros((nx, ny, nz), dtype=float, device=device)
-    uz = wp.zeros((nx, ny, nz), dtype=float, device=device)
-
-    # Note: Full LBM kernel implementation would go here
-    # For now, return None to trigger fallback to empirical
-    wall_time = time.time() - start_time
-
-    print(f"  Warp simulation: {wall_time:.1f}s ({nx}x{ny}x{nz} grid)")
-    print("  NOTE: Warp LBM solver is experimental — use Omniverse Flow for production")
+    print(f"  Warp LBM solver not yet implemented ({nx}x{ny}x{nz} grid planned)")
+    print("  NOTE: Use Omniverse Flow for production GPU CFD")
 
     return None  # Triggers fallback
 
@@ -357,14 +344,38 @@ def run_omniverse_cfd(params, config: Optional[OmniverseConfig] = None) -> Optio
         config = OmniverseConfig()
 
     print(f"\n{'='*60}")
-    print(f"  NVIDIA Omniverse CFD Simulation")
+    print("  NVIDIA Omniverse CFD Simulation")
     print(f"{'='*60}")
 
-    # Step 1: Ensure USD file exists
-    usd_path = PROJECT_DIR / "omniverse" / "f1_car.usda"
+    # Step 1: Generate geometry for the given params via Blender, then convert to USD
     stl_path = DEFAULT_STL
+    usd_path = PROJECT_DIR / "omniverse" / "f1_car.usda"
 
-    if not usd_path.exists() or stl_path.stat().st_mtime > usd_path.stat().st_mtime if usd_path.exists() else True:
+    # Re-generate STL if params differ from default (trigger Blender re-run)
+    if hasattr(params, "ride_height"):
+        try:
+            blender_script = PROJECT_DIR / "blender" / "f1_car_generator.py"
+            stl_dir = stl_path.parent
+            cmd = [
+                "blender", "--background", "--python", str(blender_script),
+                "--",
+                "--ride-height", str(params.ride_height),
+                "--front-wing-angle", str(params.front_wing_angle),
+                "--rear-wing-angle", str(params.rear_wing_angle),
+                "--diffuser-angle", str(params.diffuser_angle),
+                "--sidepod-undercut", str(params.sidepod_undercut),
+                "--output-dir", str(stl_dir),
+            ]
+            subprocess.run(cmd, capture_output=True, timeout=120)
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            pass  # Blender not available; use existing STL if present
+
+    # Convert STL -> USD if needed (stale or missing)
+    needs_conversion = (
+        not usd_path.exists() or
+        (stl_path.exists() and stl_path.stat().st_mtime > usd_path.stat().st_mtime)
+    )
+    if needs_conversion:
         print("  Converting STL → USD...")
         if not convert_stl_to_usd(stl_path, usd_path, with_wind_tunnel=True):
             print("  ERROR: USD conversion failed")
@@ -400,7 +411,7 @@ def run_omniverse_cfd(params, config: Optional[OmniverseConfig] = None) -> Optio
 
     result["notes"] = f"Omniverse Flow (GPU, {config.flow_resolution} resolution)"
 
-    print(f"\n  Results:")
+    print("\n  Results:")
     print(f"    Cd = {result.get('cd', 'N/A')}")
     print(f"    Cl = {result.get('cl', 'N/A')}")
     print(f"    L/D = {result.get('ld_ratio', 'N/A')}")
@@ -436,7 +447,7 @@ def main():
         print(f"\n  STL found: {DEFAULT_STL}")
         print("  Run with --test to attempt full simulation")
     else:
-        print(f"\n  No STL found. Generate first with:")
+        print("\n  No STL found. Generate first with:")
         print("  blender --background --python blender/f1_car_generator.py")
 
     if "--test" in sys.argv:

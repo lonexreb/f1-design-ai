@@ -268,24 +268,26 @@ class F1AeroNet:
         }
 
     def save(self, path: Path):
-        """Save model and normalization stats."""
+        """Save model and normalization stats (tensors only for safe loading)."""
         path.parent.mkdir(parents=True, exist_ok=True)
         torch.save({
             "model_state": self.model.state_dict(),
             "hidden_layers": self.hidden_layers,
             "physics_weight": self.physics_weight,
-            "y_mean": self.y_mean,
-            "y_std": self.y_std,
+            "y_mean": torch.tensor(self.y_mean) if not isinstance(self.y_mean, torch.Tensor) else self.y_mean,
+            "y_std": torch.tensor(self.y_std) if not isinstance(self.y_std, torch.Tensor) else self.y_std,
         }, str(path))
         print(f"  Model saved: {path}")
 
     def load(self, path: Path):
         """Load model and normalization stats."""
-        checkpoint = torch.load(str(path), map_location=DEVICE, weights_only=False)
+        checkpoint = torch.load(str(path), map_location=DEVICE, weights_only=True)
         self.hidden_layers = checkpoint["hidden_layers"]
         self.physics_weight = checkpoint["physics_weight"]
-        self.y_mean = checkpoint["y_mean"]
-        self.y_std = checkpoint["y_std"]
+        y_mean = checkpoint["y_mean"]
+        y_std = checkpoint["y_std"]
+        self.y_mean = y_mean.numpy() if isinstance(y_mean, torch.Tensor) else y_mean
+        self.y_std = y_std.numpy() if isinstance(y_std, torch.Tensor) else y_std
         self._build_model()
         self.model.load_state_dict(checkpoint["model_state"])
         self.model.eval()
@@ -313,7 +315,7 @@ def train_modulus(data_path: Path, epochs: int = 2000,
     # Validate with a quick prediction
     test_params = {name: (lo + hi) / 2 for name, (lo, hi) in PARAM_BOUNDS.items()}
     pred = net.predict(test_params)
-    print(f"\n  Validation (baseline params):")
+    print("\n  Validation (baseline params):")
     print(f"    Cd = {pred['cd']}, Cl = {pred['cl']}, L/D = {pred['ld_ratio']}")
 
     return model_path
@@ -374,7 +376,7 @@ def main():
         }
         result = predict_modulus(params, args.model)
         if result:
-            print(f"\n  Prediction:")
+            print("\n  Prediction:")
             print(f"    Cd = {result['cd']}")
             print(f"    Cl = {result['cl']}")
             print(f"    L/D = {result['ld_ratio']}")
@@ -391,7 +393,7 @@ def main():
         print(f"  Device:  {DEVICE}")
         print(f"  Modulus: {'Available' if HAS_MODULUS else 'Not installed (using plain PyTorch)'}")
         print(f"  Model:   {'EXISTS' if args.model.exists() else 'Not trained yet'}")
-        print(f"\n  Usage:")
+        print("\n  Usage:")
         print(f"    Train: python3 {__file__} --train")
         print(f"    Predict: python3 {__file__} --predict --rear-wing-angle 20")
 

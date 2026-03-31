@@ -107,7 +107,7 @@ def run_experiment(model_name: str, data_path: str,
     print(f"  Model: {model.name} ({type(model).__name__})")
 
     # Train
-    print(f"  Training...")
+    print("  Training...")
     train_metrics = model.fit(ds["X_train"], ds["Y_train"])
     print(f"  Train time: {train_metrics.get('train_time_s', 0):.2f}s")
 
@@ -120,9 +120,9 @@ def run_experiment(model_name: str, data_path: str,
     test_eval = compute_metrics(ds["Y_test"], Y_test_pred, ds["target_stats"])
 
     # Print results
-    print(f"\n  Train metrics:")
+    print("\n  Train metrics:")
     print(f"    R² Cd: {train_eval['r2_cd']:.4f}, Cl: {train_eval['r2_cl']:.4f}, L/D: {train_eval['r2_ld_ratio']:.4f}")
-    print(f"  Test metrics:")
+    print("  Test metrics:")
     print(f"    R² Cd: {test_eval['r2_cd']:.4f}, Cl: {test_eval['r2_cl']:.4f}, L/D: {test_eval['r2_ld_ratio']:.4f}")
     print(f"    Physics violations: {test_eval['physics_violations']}")
 
@@ -170,7 +170,7 @@ def compare_all_models(data_path: str) -> list:
 
     # Summary table
     print(f"\n{'='*60}")
-    print(f"  COMPARISON SUMMARY")
+    print("  COMPARISON SUMMARY")
     print(f"{'='*60}")
     print(f"  {'Model':<10} | {'R² Cd':>8} | {'R² Cl':>8} | {'R² L/D':>8} | {'Violations':>10} | {'Time':>6}")
     print(f"  {'-'*10}-+-{'-'*8}-+-{'-'*8}-+-{'-'*8}-+-{'-'*10}-+-{'-'*6}")

@@ -32,6 +32,7 @@ import os
 import subprocess
 import sys
 import time
+import traceback
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Optional
@@ -421,7 +422,9 @@ def run_surrogate(params: SimulationParams) -> SimulationResult:
     """Run prediction via best Autoresearch-trained ML surrogate."""
     try:
         sys.path.insert(0, str(ML_DIR.parent))
-        from ml.data_prep import PARAM_NAMES, PARAM_BOUNDS, normalize
+        from ml.data_prep import (PARAM_NAMES, PARAM_BOUNDS, normalize,
+                                  standardize_targets, destandardize_targets,
+                                  load_results, results_to_arrays)
         from ml.surrogate import GPSurrogate, MLPSurrogate, LinearSurrogate
     except ImportError:
         print("  ERROR: ml package not found")
@@ -437,8 +440,20 @@ def run_surrogate(params: SimulationParams) -> SimulationResult:
         "sidepod_undercut": params.sidepod_undercut,
     }
 
-    # Try loading models in priority order
+    # Load target stats for destandardization
+    target_stats = None
+    data_path = RESULTS_DIR / "sweep_all.json"
+    if data_path.exists():
+        try:
+            data = load_results(data_path)
+            _, Y_raw = results_to_arrays(data)
+            _, target_stats = standardize_targets(Y_raw)
+        except Exception:
+            pass
+
+    # Try loading models in priority order (GP saves as .pt with GPyTorch)
     model_candidates = [
+        (MODELS_DIR / "gp_latest.pt", GPSurrogate),
         (MODELS_DIR / "gp_latest.pkl", GPSurrogate),
         (MODELS_DIR / "mlp_latest.pt", MLPSurrogate),
         (MODELS_DIR / "linear_latest.pkl", LinearSurrogate),
@@ -452,9 +467,14 @@ def run_surrogate(params: SimulationParams) -> SimulationResult:
 
                 X = np.array([[params_dict[name] for name in PARAM_NAMES]], dtype=np.float32)
                 X_norm, _ = normalize(X)
-                pred = model.predict(X_norm)
+                pred_std = model.predict(X_norm)
 
-                # Destandardize (approximate — proper stats would be loaded from checkpoint)
+                # Destandardize predictions back to physical units
+                if target_stats is not None:
+                    pred = destandardize_targets(pred_std, target_stats)
+                else:
+                    pred = pred_std
+
                 return SimulationResult(
                     params=params,
                     cd=round(float(pred[0, 0]), 4),
@@ -636,6 +656,7 @@ def main():
             run_autoresearch(iterations=10)
         except Exception as e:
             print(f"  ERROR: {e}")
+            traceback.print_exc()
             print("  Try: python3 ml/autoresearch_config.py --setup && python3 ml/autoresearch_config.py --run")
         return
 
@@ -650,6 +671,7 @@ def main():
                                  backend=args.backend)
         except Exception as e:
             print(f"  ERROR: {e}")
+            traceback.print_exc()
             print("  Try: python3 ml/active_learning.py --iterations 5")
         return
 

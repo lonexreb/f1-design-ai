@@ -184,10 +184,10 @@ def setup_autoresearch():
         print("  Or: pip install -r requirements.txt")
 
     print(f"\n  Setup complete. Directory: {AUTORESEARCH_DIR}")
-    print(f"\n  To run Autoresearch:")
-    print(f"    aresearch run --seed autoresearch/seed_paper.md \\")
-    print(f"      --script 'python3 autoresearch/run.py' \\")
-    print(f"      --iterations 10")
+    print("\n  To run Autoresearch:")
+    print("    aresearch run --seed autoresearch/seed_paper.md \\")
+    print("      --script 'python3 autoresearch/run.py' \\")
+    print("      --iterations 10")
 
     return True
 
@@ -256,7 +256,7 @@ def _manual_research_loop(iterations: int) -> bool:
             log.append(result)
         except Exception as e:
             print(f"  SKIP {model_name} {kwargs}: {e}")
-            log.append({"model": model_name, "kwargs": kwargs, "error": str(e)})
+            log.append({"model": model_name, "kwargs": kwargs, "error": str(e), "error_type": type(e).__name__})
 
     # Save experiment log
     log_path.write_text(json.dumps(log, indent=2, default=str))
