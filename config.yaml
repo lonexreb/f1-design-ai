@@ -1,0 +1,148 @@
+# F1 Aerodynamic Design Pipeline - Central Configuration
+# Override via CLI flags or environment variables
+
+# === Simulation Backends ===
+backends:
+  # Priority order for automatic fallback
+  # Pipeline tries each in order until one works
+  priority:
+    - omniverse    # NVIDIA Omniverse Flow (GPU CFD)
+    - openfoam     # OpenFOAM simpleFoam (CPU CFD)
+    - modulus      # NVIDIA Modulus PINN surrogate
+    - surrogate    # Best ML surrogate from ml/models/
+    - estimate     # Empirical correlations (always available)
+
+  openfoam:
+    solver: simpleFoam
+    turbulence_model: kOmegaSST
+    max_iterations: 2000
+    convergence_threshold: 1.0e-5
+    use_docker: false
+
+  omniverse:
+    # Omniverse Kit / Flow configuration
+    kit_path: null          # Auto-detect if null
+    flow_resolution: medium # low, medium, high
+    gpu_device: 0
+    # Wind tunnel domain (meters) - matches OpenFOAM setup
+    domain:
+      x_min: -30.0
+      x_max: 60.0
+      y_min: -15.0
+      y_max: 15.0
+      z_min: 0.0
+      z_max: 20.0
+
+  modulus:
+    model_path: ml/models/modulus_pinn_latest.pt
+    train_on_missing: true  # Auto-train if model doesn't exist
+
+# === Simulation Physics ===
+simulation:
+  velocity_ms: 83.33        # 300 km/h
+  velocity_kmh: 300.0
+  air_density: 1.225        # kg/m³ (sea level, 20°C)
+  kinematic_viscosity: 1.516e-5  # m²/s
+  reference_area: 1.5       # m² (frontal area)
+  car_length: 5.640         # m (FIA 2024)
+
+# === Parametric Design Space ===
+parameters:
+  ride_height:
+    default: 0.030
+    min: 0.020
+    max: 0.050
+    unit: meters
+  front_wing_angle:
+    default: 14.0
+    min: 10.0
+    max: 20.0
+    unit: degrees
+  rear_wing_angle:
+    default: 16.0
+    min: 10.0
+    max: 22.0
+    unit: degrees
+  diffuser_angle:
+    default: 12.0
+    min: 6.0
+    max: 18.0
+    unit: degrees
+  sidepod_undercut:
+    default: 0.15
+    min: 0.08
+    max: 0.20
+    unit: meters
+
+# === ML Surrogate Models ===
+ml:
+  # Model selection
+  default_model: gp          # linear, mlp, gp, pinn
+  models_dir: ml/models
+
+  # MLP hyperparameters
+  mlp:
+    hidden_layers: [64, 64, 32]
+    activation: relu
+    dropout: 0.1
+    learning_rate: 0.001
+    epochs: 500
+    batch_size: 16
+
+  # Gaussian Process hyperparameters
+  gp:
+    kernel: matern25          # rbf, matern15, matern25
+    normalize_y: true
+    n_restarts: 10
+
+  # NVIDIA Modulus PINN
+  pinn:
+    hidden_layers: [128, 128, 128, 64]
+    activation: silu
+    learning_rate: 0.0005
+    epochs: 2000
+    physics_loss_weight: 0.1  # Weight for NS residual loss
+    data_loss_weight: 1.0
+
+  # Training settings
+  train_test_split: 0.8
+  random_seed: 42
+  device: auto               # auto, cpu, cuda, mps
+
+# === Karpathy's Autoresearch ===
+autoresearch:
+  iterations: 10              # Number of research iterations
+  models_to_try:
+    - linear
+    - mlp
+    - gp
+    - pinn
+  evaluation_metrics:
+    - r2_cd
+    - r2_cl
+    - r2_ld
+    - mse_total
+    - physics_violations
+  seed_question: >
+    Find the best ML architecture to predict F1 aerodynamic coefficients
+    (Cd, Cl, L/D ratio) from 5 design parameters (ride_height, front_wing_angle,
+    rear_wing_angle, diffuser_angle, sidepod_undercut) using limited training data
+    (32-100 CFD/empirical data points).
+
+# === Active Learning ===
+active_learning:
+  acquisition: uncertainty     # uncertainty, expected_improvement, ucb
+  n_candidates: 1000          # Random candidates to evaluate
+  batch_size: 1               # Params to propose per iteration
+  backend: omniverse           # Backend for new simulations
+
+# === Paths ===
+paths:
+  project_root: .
+  blender_script: blender/f1_car_generator.py
+  openfoam_case: openfoam/f1_baseline
+  results_dir: results
+  models_dir: ml/models
+  stl_dir: openfoam/f1_baseline/constant/triSurface
+  usd_dir: omniverse
+  autoresearch_dir: autoresearch
