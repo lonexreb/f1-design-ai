@@ -27,10 +27,13 @@ import subprocess
 import sys
 from pathlib import Path
 
+from ml.config import load_config
+
 PROJECT_DIR = Path(__file__).parent.parent.resolve()
 AUTORESEARCH_DIR = PROJECT_DIR / "autoresearch"
 RESULTS_DIR = PROJECT_DIR / "results"
 ML_DIR = PROJECT_DIR / "ml"
+_cfg = load_config()
 
 # Autoresearch seed document - describes the research problem
 SEED_PAPER = """# Predicting F1 Aerodynamic Coefficients with ML Surrogates
@@ -155,9 +158,19 @@ def setup_autoresearch():
 
     AUTORESEARCH_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Write seed paper
+    # Write seed paper — inject seed_question from config.yaml if available
+    seed_question = _cfg.autoresearch.get("seed_question", "").strip()
+    seed_content = SEED_PAPER
+    if seed_question:
+        seed_content = seed_content.replace(
+            "Can we train a machine learning model to accurately predict F1 car aerodynamic\n"
+            "coefficients (drag coefficient Cd, lift coefficient Cl, and lift-to-drag ratio L/D)\n"
+            "from 5 design parameters, using limited training data (32-100 points)?",
+            seed_question,
+        )
+
     seed_path = AUTORESEARCH_DIR / "seed_paper.md"
-    seed_path.write_text(SEED_PAPER)
+    seed_path.write_text(seed_content)
     print(f"  Created: {seed_path}")
 
     # Write run script
@@ -192,8 +205,10 @@ def setup_autoresearch():
     return True
 
 
-def run_autoresearch(iterations: int = 10):
+def run_autoresearch(iterations: int = None):
     """Execute Autoresearch research loop."""
+    if iterations is None:
+        iterations = _cfg.autoresearch.get("iterations", 10)
     print("=" * 60)
     print(f"  Running Autoresearch ({iterations} iterations)")
     print("=" * 60)
@@ -226,11 +241,13 @@ def _manual_research_loop(iterations: int) -> bool:
     """
     sys.path.insert(0, str(PROJECT_DIR))
     from ml.experiment import run_experiment, compare_all_models
+    from ml.surrogate import MODELS
 
     data_path = str(RESULTS_DIR / "sweep_all.json")
+    models_to_try = _cfg.autoresearch.get("models_to_try", list(MODELS.keys()))
 
-    # First: compare all baseline models
-    print("\n  Phase 1: Baseline model comparison")
+    # First: compare baseline models from config
+    print(f"\n  Phase 1: Baseline model comparison ({', '.join(models_to_try)})")
     results = compare_all_models(data_path)
 
     # Log results
@@ -328,7 +345,7 @@ def main():
     parser.add_argument("--setup", action="store_true", help="Initialize Autoresearch")
     parser.add_argument("--run", action="store_true", help="Run research loop")
     parser.add_argument("--status", action="store_true", help="Show experiment status")
-    parser.add_argument("--iterations", type=int, default=10, help="Research iterations")
+    parser.add_argument("--iterations", type=int, default=None, help="Research iterations")
     args = parser.parse_args()
 
     if args.setup:

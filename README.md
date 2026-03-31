@@ -29,12 +29,14 @@ f1-design-ai/
 │   ├── convert_to_usd.py         # STL -> USD conversion for Omniverse
 │   ├── modulus_surrogate.py      # NVIDIA Modulus PINN surrogate (F1AeroNet)
 │   ├── openfoam-docker.sh        # OpenFOAM Docker wrapper (Apple Silicon compatible)
-│   └── install.sh                # macOS tool installer (Homebrew-based)
+│   ├── install.sh                # macOS tool installer (Homebrew-based)
+│   └── setup-windows.sh          # Windows setup (venv, PyTorch CUDA, deps)
 ├── ml/                           # ML surrogate pipeline
 │   ├── surrogate.py              # 4 model types: Linear, MLP, GP, PINN
 │   ├── data_prep.py              # Data loading, normalization, train/test split
 │   ├── experiment.py             # Experiment runner + model comparison
 │   ├── autoresearch_config.py    # Karpathy's autoresearch pattern
+│   ├── config.py                 # Config loader (reads config.yaml, typed access, caching)
 │   ├── active_learning.py        # GP uncertainty-driven parameter proposal
 │   └── models/                   # Trained model artifacts (.pkl, .pt)
 ├── openfoam/
@@ -60,8 +62,12 @@ f1-design-ai/
 ## Quick Start
 
 ```bash
-# 1. Install tools (macOS)
+# 1. Install tools
+# macOS:
 chmod +x scripts/install.sh && ./scripts/install.sh
+# Windows (Git Bash / WSL):
+chmod +x scripts/setup-windows.sh && ./scripts/setup-windows.sh
+# Or manually:
 pip install -r requirements.txt
 
 # 2. Generate baseline F1 car geometry

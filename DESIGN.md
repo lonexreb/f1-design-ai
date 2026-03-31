@@ -123,10 +123,13 @@ Physics loss weight: 0.1 (data loss weight: 1.0). Tuned to guide without overrid
 - **Current limitation**: Manual loop runs only 7 fixed experiments (4 baseline models + 3 HP variations). True autoresearch needs LLM-driven hypothesis generation per iteration.
 - **Future**: Connect to OpenClaw/NemoClaw for LLM-in-the-loop experiment design.
 
-### config.yaml disconnection (known debt)
+### ~~config.yaml disconnection~~ RESOLVED (2026-03-31)
 - `config.yaml` defines all parameters, hyperparameters, and paths centrally
-- `ml/` modules use hard-coded values in `data_prep.py` (PARAM_BOUNDS) and `surrogate.py` (model architectures)
-- These MUST be wired together. Currently dual sources of truth = drift risk.
+- `ml/config.py` loads and caches config.yaml with typed access (`Config` class)
+- `ml/data_prep.py` reads `PARAM_NAMES`, `PARAM_BOUNDS`, `train_test_split`, `random_seed` from config
+- `ml/surrogate.py` reads model defaults (MLP, GP, PINN hyperparameters) from config
+- `ml/autoresearch_config.py` reads `seed_question`, `iterations`, `models_to_try` from config
+- Explicit kwargs always override config defaults (no breaking changes)
 
 ## NVIDIA Omniverse Integration
 
@@ -233,7 +236,7 @@ README.md is significantly outdated and does not reflect the current project sta
 
 | Debt | Impact | Priority |
 |---|---|---|
-| config.yaml disconnected from ml/ modules | Parameter bounds duplicated in config.yaml and data_prep.py; drift risk | P2 |
+| ~~config.yaml disconnected from ml/ modules~~ | ~~Parameter bounds duplicated~~ **RESOLVED**: ml/config.py wires config.yaml to all ml/ modules | ~~P2~~ DONE |
 | Empirical model missing Cd sensitivities | ride_height, diffuser, sidepod don't affect Cd (physically wrong) | P6 |
 | No wing stall modeling | Overpredicts performance at extreme angles (>18-20 deg) | P6 |
 | Autoresearch uses 7 fixed experiments | Not LLM-driven; no hypothesis generation per iteration | P3 |

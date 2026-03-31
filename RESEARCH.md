@@ -112,8 +112,8 @@ OpenClaw provides the sandboxed execution environment; autoresearch provides the
 
 ## Research Gaps & Directions
 
-### Near-term: Wire config.yaml + fix autoresearch
-- `config.yaml` defines all parameters/hyperparameters but ml/ modules ignore it (hard-coded values)
+### ~~Near-term: Wire config.yaml~~ DONE (2026-03-31) + fix autoresearch
+- ~~`config.yaml` defines all parameters/hyperparameters but ml/ modules ignore it~~ **RESOLVED**: `ml/config.py` wires config.yaml to all ml/ modules
 - Autoresearch manual loop limited to 7 experiments; needs LLM-driven hypothesis generation
 - Active learning and autoresearch are disconnected workflows
 
@@ -152,4 +152,5 @@ OpenClaw provides the sandboxed execution environment; autoresearch provides the
 | Best test MSE | 0.0038 (PINN, physics_weight=0.05) |
 | Physics violations | 0 across all 11 experiments |
 | Test coverage | 0% (no tests exist) |
+| Config wiring | DONE — ml/config.py connects config.yaml to all ml/ modules |
 | Git commits | 12 (initial + Omniverse/ML integration + review fixes + compat + docs) |

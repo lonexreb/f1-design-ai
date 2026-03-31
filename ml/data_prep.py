@@ -16,19 +16,14 @@ from typing import Optional
 
 import numpy as np
 
+from ml.config import load_config
+
 PROJECT_DIR = Path(__file__).parent.parent.resolve()
 
-PARAM_NAMES = ["ride_height", "front_wing_angle", "rear_wing_angle",
-               "diffuser_angle", "sidepod_undercut"]
+_cfg = load_config()
+PARAM_NAMES = _cfg.param_names()
 TARGET_NAMES = ["cd", "cl", "ld_ratio"]
-
-PARAM_BOUNDS = {
-    "ride_height": (0.020, 0.050),
-    "front_wing_angle": (10.0, 20.0),
-    "rear_wing_angle": (10.0, 22.0),
-    "diffuser_angle": (6.0, 18.0),
-    "sidepod_undercut": (0.08, 0.20),
-}
+PARAM_BOUNDS = _cfg.param_bounds()
 
 
 def load_results(path: Path) -> list:
@@ -107,8 +102,8 @@ def destandardize_targets(Y_std: np.ndarray, stats: dict) -> np.ndarray:
 
 
 def train_test_split(X: np.ndarray, Y: np.ndarray,
-                     train_ratio: float = 0.8,
-                     seed: int = 42) -> dict:
+                     train_ratio: float = _cfg.train_test_split,
+                     seed: int = _cfg.random_seed) -> dict:
     """
     Split data into train and test sets.
 
@@ -133,8 +128,8 @@ def train_test_split(X: np.ndarray, Y: np.ndarray,
     }
 
 
-def prepare_dataset(data_path: str, train_ratio: float = 0.8,
-                    seed: int = 42) -> dict:
+def prepare_dataset(data_path: str, train_ratio: float = _cfg.train_test_split,
+                    seed: int = _cfg.random_seed) -> dict:
     """
     Full data preparation pipeline: load → arrays → normalize → split.
 

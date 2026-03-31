@@ -1,0 +1,18 @@
+[
+  {
+    "params": {
+      "ride_height": 0.03,
+      "front_wing_angle": 14.0,
+      "rear_wing_angle": 16.0,
+      "diffuser_angle": 12.0,
+      "sidepod_undercut": 0.15
+    },
+    "cd": 0.95,
+    "cl": -3.5,
+    "ld_ratio": 3.68,
+    "converged": false,
+    "iterations": 0,
+    "wall_time_s": 0.0,
+    "notes": "Empirical estimate (no CFD run)"
+  }
+]

@@ -28,7 +28,10 @@ from typing import Optional
 
 import numpy as np
 
+from ml.config import load_config
+
 PROJECT_DIR = Path(__file__).parent.parent.resolve()
+_cfg = load_config()
 
 
 class SurrogateModel(ABC):
@@ -134,12 +137,13 @@ class MLPSurrogate(SurrogateModel):
 
     name = "mlp"
 
-    def __init__(self, hidden_layers=None, lr: float = 0.001,
-                 epochs: int = 500, dropout: float = 0.1):
-        self.hidden_layers = hidden_layers or [64, 64, 32]
-        self.lr = lr
-        self.epochs = epochs
-        self.dropout = dropout
+    def __init__(self, hidden_layers=None, lr: float = None,
+                 epochs: int = None, dropout: float = None):
+        _hp = _cfg.ml_hyperparams("mlp")
+        self.hidden_layers = hidden_layers or _hp.get("hidden_layers", [64, 64, 32])
+        self.lr = lr if lr is not None else _hp.get("learning_rate", 0.001)
+        self.epochs = epochs if epochs is not None else _hp.get("epochs", 500)
+        self.dropout = dropout if dropout is not None else _hp.get("dropout", 0.1)
         self.model = None
 
     def _build(self, in_dim: int, out_dim: int):
@@ -229,9 +233,10 @@ class GPSurrogate(SurrogateModel):
 
     name = "gp"
 
-    def __init__(self, kernel: str = "matern25", n_restarts: int = 10):
-        self.kernel_name = kernel
-        self.n_restarts = n_restarts
+    def __init__(self, kernel: str = None, n_restarts: int = None):
+        _hp = _cfg.ml_hyperparams("gp")
+        self.kernel_name = kernel or _hp.get("kernel", "matern25")
+        self.n_restarts = n_restarts if n_restarts is not None else _hp.get("n_restarts", 10)
         self.models = []  # One GP per output dimension
 
     def fit(self, X: np.ndarray, Y: np.ndarray) -> dict:
@@ -443,9 +448,10 @@ class ModulusSurrogate(SurrogateModel):
 
     name = "pinn"
 
-    def __init__(self, epochs: int = 2000, physics_weight: float = 0.1):
-        self.epochs = epochs
-        self.physics_weight = physics_weight
+    def __init__(self, epochs: int = None, physics_weight: float = None):
+        _hp = _cfg.ml_hyperparams("pinn")
+        self.epochs = epochs if epochs is not None else _hp.get("epochs", 2000)
+        self.physics_weight = physics_weight if physics_weight is not None else _hp.get("physics_loss_weight", 0.1)
         self._net = None
 
     def fit(self, X: np.ndarray, Y: np.ndarray) -> dict:

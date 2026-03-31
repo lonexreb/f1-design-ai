@@ -12,12 +12,14 @@ scripts/convert_to_usd.py         STL -> USD conversion for Omniverse (wind tunn
 scripts/modulus_surrogate.py      NVIDIA Modulus PINN surrogate (F1AeroNet, physics-constrained)
 scripts/openfoam-docker.sh        OpenFOAM Docker wrapper (fallback when not installed locally)
 scripts/install.sh                macOS tool installer (Homebrew-based)
+scripts/setup-windows.sh          Windows setup (venv, PyTorch CUDA, dependencies, tool verification)
 config.yaml                       Central configuration (backends, physics, ML hyperparameters, paths)
 ml/                               ML surrogate pipeline:
-  ml/surrogate.py                   4 model types: Linear, MLP, GP (with uncertainty), PINN
-  ml/data_prep.py                   Data loading, normalization, train/test split
+  ml/config.py                      Config loader — reads config.yaml, typed access, caching (single source of truth)
+  ml/surrogate.py                   4 model types: Linear, MLP, GP (with uncertainty), PINN (defaults from config.yaml)
+  ml/data_prep.py                   Data loading, normalization, train/test split (bounds & splits from config.yaml)
   ml/experiment.py                  Experiment runner + model comparison
-  ml/autoresearch_config.py         Karpathy's autoresearch pattern (seed paper + experiment loop)
+  ml/autoresearch_config.py         Karpathy's autoresearch pattern (seed paper + experiment loop, config-driven)
   ml/active_learning.py             GP uncertainty-driven parameter proposal + simulation
 openfoam/f1_baseline/             Complete OpenFOAM case (simpleFoam, k-omega SST, 300 km/h, Re~31M)
 autoresearch/                     Autoresearch experiment tracking:
@@ -25,6 +27,7 @@ autoresearch/                     Autoresearch experiment tracking:
   autoresearch/run.py               Experiment entry point (accepts --model, --lr, --epochs, etc.)
   autoresearch/experiment_log.json  Results from 11 completed experiments
 results/sweep_all.json            32 empirical parameter sweep results (no CFD validation yet)
+results/baseline_result.json      Baseline configuration empirical result
 .gitignore                        Ignores OpenFOAM runtime, STL, ML artifacts, venv, IDE files
 ```
 
@@ -89,7 +92,7 @@ pip install -r requirements.txt
 | diffuser_angle | 12.0 | 6 - 18 | degrees |
 | sidepod_undercut | 0.15 | 0.08 - 0.20 | meters |
 
-Bounds defined in both `config.yaml` (truth source) and `ml/data_prep.py` (hard-coded duplicate).
+Bounds defined in `config.yaml` (single source of truth), loaded by `ml/config.py`.
 
 ## ML Surrogate Models
 
@@ -107,6 +110,7 @@ Bounds defined in both `config.yaml` (truth source) and `ml/data_prep.py` (hard-
 - All dimensions in SI units (meters, degrees, m/s, kg/m^3)
 - FIA reference constants at module level
 - ML models follow base class interface: `fit()`, `predict()`, optional `uncertainty()`, `save()`, `load()`
+- ML hyperparameters default from `config.yaml` via `ml/config.py`; explicit kwargs override config values
 - Results stored as JSON arrays; experiment logs as JSONL
 - Physics violations tracked: Cd<0, Cl>0, Cd>2.0, Cl<-8.0
 
@@ -114,7 +118,7 @@ Bounds defined in both `config.yaml` (truth source) and `ml/data_prep.py` (hard-
 
 - **No CFD runs completed** - all 32 results in sweep_all.json are empirical estimates
 - **OpenClaw/NemoClaw AI orchestration** - referenced in README but no code exists
-- **config.yaml is disconnected** - ml/ modules use hard-coded values, not config.yaml
+- ~~**config.yaml is disconnected**~~ DONE (2026-03-31) - ml/config.py wires config.yaml to all ml/ modules
 - **Autoresearch ran but limited** - 11 experiments completed (see EXPERIMENT.md); manual loop with 7 hard-coded HP experiments; no LLM-driven hypothesis generation yet
 - **Active learning + autoresearch disconnected** - parallel workflows that should be unified
 - **Warp LBM solver** - placeholder in omniverse_sim.py (returns None)

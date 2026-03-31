@@ -21,21 +21,24 @@ _Nothing else matters until the Blender -> simulation -> results chain actually 
 
 ---
 
-## P2: Wire config.yaml to ML Modules
-_Central config exists but ml/ modules ignore it. Dual sources of truth = drift risk._
+## ~~P2: Wire config.yaml to ML Modules~~ DONE (2026-03-31)
+_~~Central config exists but ml/ modules ignore it. Dual sources of truth = drift risk.~~_
 
-### 2.1 Make ml/data_prep.py read from config.yaml
-- Replace hard-coded `PARAM_BOUNDS` dict with config.yaml `parameters` section
-- Add `load_config()` utility function
+**Implementation**: Added `ml/config.py` — a Config loader with caching and typed access to all config.yaml sections.
 
-### 2.2 Make ml/surrogate.py read hyperparameters from config.yaml
-- MLP hidden layers, dropout, learning rate, epochs
-- GP kernel type, n_restarts
-- PINN architecture, physics loss weight
+### ~~2.1 Make ml/data_prep.py read from config.yaml~~ DONE
+- `PARAM_NAMES` and `PARAM_BOUNDS` now loaded from config.yaml via `ml.config.load_config()`
+- `train_test_split` and `random_seed` defaults from config
 
-### 2.3 Make ml/autoresearch_config.py use config.yaml
-- Read `autoresearch.iterations`, `autoresearch.models_to_try`
-- Read `autoresearch.seed_question` instead of hard-coded SEED_PAPER
+### ~~2.2 Make ml/surrogate.py read hyperparameters from config.yaml~~ DONE
+- MLP: hidden_layers, dropout, learning_rate, epochs from config
+- GP: kernel, n_restarts from config
+- PINN: epochs, physics_loss_weight from config
+- All accept explicit kwargs that override config defaults
+
+### ~~2.3 Make ml/autoresearch_config.py use config.yaml~~ DONE
+- Reads `autoresearch.iterations`, `autoresearch.models_to_try`
+- Reads `autoresearch.seed_question` and injects into seed paper
 
 ---
 
