@@ -398,9 +398,12 @@ def run_modulus(params: SimulationParams) -> SimulationResult:
     if result_dict is None:
         data_path = RESULTS_DIR / "sweep_all.json"
         if data_path.exists():
-            print("  Auto-training Modulus PINN on existing data...")
-            train_modulus(data_path)
-            result_dict = predict_modulus(params_dict)
+            try:
+                print("  Auto-training Modulus PINN on existing data...")
+                train_modulus(data_path)
+                result_dict = predict_modulus(params_dict)
+            except Exception as e:
+                print(f"  Modulus auto-training failed ({e}), falling back to empirical estimate")
 
     if result_dict is None:
         print("  Modulus prediction failed, falling back to empirical estimate")
@@ -511,7 +514,7 @@ def run_with_backend(params: SimulationParams, backend: str,
     else:  # openfoam (default)
         if blender_cmd:
             if not run_blender(params, blender_cmd):
-                print("  WARNING: Blender geometry generation failed")
+                raise RuntimeError("Blender geometry generation failed; cannot run OpenFOAM with stale geometry")
         if of_cmds:
             if not run_openfoam(of_cmds):
                 raise RuntimeError("OpenFOAM simulation failed; cannot extract results")

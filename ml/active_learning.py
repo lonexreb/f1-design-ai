@@ -86,9 +86,9 @@ def propose_next_params(gp_model: GPSurrogate,
         total_var = uncertainty.sum(axis=1)
         idx = np.argmax(total_var)
     elif acquisition == "ucb":
-        # Upper confidence bound: mean + 2*std
+        # Upper confidence bound: mean + 2*std (standard UCB formulation)
         predictions = gp_model.predict(candidates)
-        ucb = np.abs(predictions).sum(axis=1) + 2.0 * np.sqrt(uncertainty.sum(axis=1))
+        ucb = predictions.sum(axis=1) + 2.0 * np.sqrt(uncertainty.sum(axis=1))
         idx = np.argmax(ucb)
     else:
         idx = np.argmax(uncertainty.sum(axis=1))
@@ -304,7 +304,7 @@ def analyze_uncertainty(data_path: str):
     data = load_results(Path(data_path))
     X, Y = results_to_arrays(data)
     X_norm, _ = normalize(X)
-    Y_std, y_stats = standardize_targets(Y)
+    Y_std, _ = standardize_targets(Y)
 
     print(f"  Data: {len(data)} samples")
 
