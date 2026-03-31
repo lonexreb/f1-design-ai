@@ -151,21 +151,26 @@ def run_simulation(params: dict, backend: str = "estimate") -> dict:
         from run_pipeline import run_blender, find_blender, run_openfoam, find_openfoam, extract_results
         blender_cmd = find_blender()
         if blender_cmd:
-            run_blender(sim_params, blender_cmd)
+            if not run_blender(sim_params, blender_cmd):
+                print("  Blender geometry generation failed, falling back to empirical estimate")
+                # Fall through to empirical fallback below
+                backend = "_failed"
         try:
-            of_cmds = find_openfoam()
-            run_openfoam(of_cmds)
-            of_result = extract_results(sim_params)
-            return {
-                "params": params,
-                "cd": of_result.cd,
-                "cl": of_result.cl,
-                "ld_ratio": of_result.ld_ratio,
-                "converged": of_result.converged,
-                "iterations": of_result.iterations,
-                "wall_time_s": of_result.wall_time_s,
-                "notes": "Active learning - OpenFOAM CFD",
-            }
+            if backend == "openfoam":
+                of_cmds = find_openfoam()
+                if not run_openfoam(of_cmds):
+                    raise RuntimeError("OpenFOAM solver returned non-zero exit code")
+                of_result = extract_results(sim_params)
+                return {
+                    "params": params,
+                    "cd": of_result.cd,
+                    "cl": of_result.cl,
+                    "ld_ratio": of_result.ld_ratio,
+                    "converged": of_result.converged,
+                    "iterations": of_result.iterations,
+                    "wall_time_s": of_result.wall_time_s,
+                    "notes": "Active learning - OpenFOAM CFD",
+                }
         except (SystemExit, Exception) as e:
             print(f"  OpenFOAM not available ({e}), falling back to empirical estimate")
 

@@ -115,15 +115,13 @@ class LinearSurrogate(SurrogateModel):
         return self.pipeline.predict(X)
 
     def save(self, path: Path):
-        import pickle
+        import joblib
         path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "wb") as f:
-            pickle.dump({"pipeline": self.pipeline, "degree": self.degree}, f)
+        joblib.dump({"pipeline": self.pipeline, "degree": self.degree}, path)
 
     def load(self, path: Path):
-        import pickle
-        with open(path, "rb") as f:
-            data = pickle.load(f)
+        import joblib
+        data = joblib.load(path)
         self.pipeline = data["pipeline"]
         self.degree = data["degree"]
 
@@ -373,12 +371,11 @@ class GPSurrogate(SurrogateModel):
         """Save GP model. Uses .pkl extension for sklearn, .pt for GPyTorch."""
         path.parent.mkdir(parents=True, exist_ok=True)
         if not self._use_gpytorch:
-            import pickle
+            import joblib
             # Ensure sklearn GP saves with .pkl extension
             if str(path).endswith(".pt"):
                 path = path.with_suffix(".pkl")
-            with open(path, "wb") as f:
-                pickle.dump({"models": self.models, "use_gpytorch": False}, f)
+            joblib.dump({"models": self.models, "use_gpytorch": False}, path)
         else:
             import torch
             torch.save({
@@ -392,9 +389,8 @@ class GPSurrogate(SurrogateModel):
     def load(self, path: Path):
         path_str = str(path)
         if path_str.endswith(".pkl"):
-            import pickle
-            with open(path, "rb") as f:
-                data = pickle.load(f)
+            import joblib
+            data = joblib.load(path)
             self._use_gpytorch = False
             self.models = data["models"]
         else:

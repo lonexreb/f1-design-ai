@@ -425,7 +425,7 @@ def run_surrogate(params: SimulationParams) -> SimulationResult:
         from ml.data_prep import (PARAM_NAMES, PARAM_BOUNDS, normalize,
                                   standardize_targets, destandardize_targets,
                                   load_results, results_to_arrays)
-        from ml.surrogate import GPSurrogate, MLPSurrogate, LinearSurrogate
+        from ml.surrogate import GPSurrogate, MLPSurrogate, LinearSurrogate, ModulusSurrogate
     except ImportError:
         print("  ERROR: ml package not found")
         return estimate_coefficients(params)
@@ -457,6 +457,7 @@ def run_surrogate(params: SimulationParams) -> SimulationResult:
         (MODELS_DIR / "gp_latest.pt", GPSurrogate),
         (MODELS_DIR / "gp_latest.pkl", GPSurrogate),
         (MODELS_DIR / "mlp_latest.pt", MLPSurrogate),
+        (MODELS_DIR / "pinn_latest.pt", ModulusSurrogate),
         (MODELS_DIR / "linear_latest.pkl", LinearSurrogate),
     ]
 
