@@ -132,20 +132,89 @@
 
 ---
 
+## ML Surrogate Experiments
+
+### Autoresearch Pipeline (`ml/autoresearch_config.py`)
+Implements Karpathy's autoresearch pattern. Run via:
+```bash
+python3 scripts/run_pipeline.py --train-surrogate
+# or directly:
+python3 -m ml.autoresearch_config run
+```
+
+**Experiment log format** (`autoresearch/experiment_log.json`):
+```json
+{
+  "experiment_id": 1,
+  "model": "gp",
+  "hyperparameters": {"kernel": "matern25", "n_restarts": 10},
+  "metrics": {"r2_cd": 0.85, "r2_cl": 0.92, "r2_ld": 0.88, "mse_total": 0.012},
+  "physics_violations": 0,
+  "training_time_s": 1.2,
+  "status": "success"
+}
+```
+
+**Current manual loop experiments** (7 fixed):
+1. Baseline comparison: Linear, MLP, GP, PINN with defaults
+2. MLP depth variations: [32,32], [64,64,32], [128,64,32]
+3. Linear degree variations: degree 2, degree 3
+4. PINN physics weight: 0.05, 0.2
+
+**Limitation**: These are hand-crafted, not LLM-driven. See NEXT-TO-DO.md P3.
+
+### Model Comparison Metrics
+Run via: `python3 -m ml.experiment --model all --data results/sweep_all.json`
+
+| Metric | What it measures |
+|---|---|
+| R^2 per target (Cd, Cl, L/D) | Prediction accuracy per output |
+| MSE total | Overall error magnitude |
+| Physics violations | Count of: Cd<0, Cl>0, Cd>2.0, Cl<-8.0 |
+| Training time | Wall clock seconds |
+
+### Active Learning Pipeline (`ml/active_learning.py`)
+Run via:
+```bash
+python3 scripts/run_pipeline.py --active-learn 5 --backend omniverse
+# or directly:
+python3 -m ml.active_learning --iterations 3
+```
+
+**Loop**: Train GP -> compute uncertainty landscape -> propose highest-uncertainty params -> run simulation -> add to dataset -> retrain
+
+**Acquisition functions**:
+- `uncertainty` (default): Propose where GP variance is highest
+- `ucb`: Upper Confidence Bound (balance exploration vs exploitation)
+
+**Candidate filtering**: 1000 random candidates, reject any within distance 0.05 of existing data points.
+
+---
+
 ## Planned Experiments
 
 ### Next: CFD Validation of Baseline
 - Run full pipeline for baseline configuration (30mm, 14/16 deg, 12 deg, 150mm)
 - Compare Cd, Cl, L/D against empirical prediction (Cd=0.95, Cl=-3.5)
 - Calibrate empirical model based on CFD delta
-- Expected runtime: 2-4 hours on modern workstation
+- Expected runtime: 2-4 hours on modern workstation (OpenFOAM)
 
 ### Next: CFD at Extreme Points
 - Min drag config: ride_height=30mm, fw=10 deg, rw=10 deg, diff=12 deg
 - Max downforce config: ride_height=25mm, fw=20 deg, rw=22 deg, diff=14 deg
-- Purpose: calibrate model at extremes, not just near baseline
+- Purpose: calibrate surrogate models at design space boundaries
+
+### Next: ML Model Comparison on Empirical Data
+- Run autoresearch on current 32-point dataset
+- Establish which model type performs best with limited data
+- Expected: GP should dominate at 32 points; MLP needs more data
+
+### Future: Active Learning with CFD
+- Train GP on initial 32 empirical + N CFD points
+- Use active learning to propose next 10-20 CFD simulations
+- Track R^2 improvement per additional CFD point (data efficiency curve)
 
 ### Future: Multi-Variable Grids
 - 2D sweep: ride_height x diffuser_angle (known strong interaction)
 - 2D sweep: front_wing_angle x rear_wing_angle (aero balance optimization)
-- Requires CFD or improved empirical model with interaction terms
+- Requires CFD backend or improved surrogate

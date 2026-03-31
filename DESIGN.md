@@ -3,18 +3,33 @@
 ## Pipeline Flow
 
 ```
-Parameter Selection --> Blender Geometry --> STL Export --> OpenFOAM Mesh --> CFD Solve --> Force Extraction --> Results JSON
-        |                                                                                                          |
-        +--- Empirical Fallback (when Blender/OpenFOAM unavailable) ------------------------------------------>---+
+                                 +---> Omniverse Flow (GPU CFD) ---+
+                                 |                                  |
+Parameter --> Blender --> STL -->-+---> OpenFOAM (CPU CFD) --------+---> Force Extraction --> Results JSON
+Selection     Geometry    Export  |                                  |
+                  |              +---> Modulus PINN (~1ms) --------+
+                  |              |                                  |
+                  |              +---> ML Surrogate (GP/MLP) ------+
+                  |              |                                  |
+                  +--- (skip) ---+---> Empirical Estimate ---------+
 ```
 
-### Graceful Degradation
-The pipeline produces useful results even when tools are missing:
-- Blender unavailable: skip geometry, use empirical estimates
-- OpenFOAM unavailable: use Docker wrapper, or fall back to empirical
-- Docker unavailable: empirical estimates only
+### Multi-Backend Fallback Chain
+The pipeline supports 5 simulation backends with automatic fallback:
+1. **Omniverse Flow** - GPU-accelerated CFD (fastest physics-based)
+2. **OpenFOAM** - CPU CFD with simpleFoam (validated, default)
+3. **Modulus PINN** - Physics-informed neural network (~1ms, auto-trains on first use)
+4. **ML Surrogate** - Best available trained model from ml/models/ (GP > MLP > PINN > Linear)
+5. **Empirical** - Correlation-based estimates (always available, instant)
 
-This enables parameter exploration before CFD infrastructure is set up.
+Each backend returns a compatible `SimulationResult`. If the chosen backend fails, the pipeline falls back to empirical estimates.
+
+### Graceful Degradation
+- Blender unavailable: skip geometry, use estimation backends
+- OpenFOAM unavailable: use Docker wrapper, or fall to Modulus/surrogate/empirical
+- Omniverse unavailable: fall to OpenFOAM or below
+- No trained models: auto-train from existing results, or use empirical
+- Nothing installed: empirical estimates still work
 
 ## Key Technical Decisions
 
@@ -53,6 +68,65 @@ This enables parameter exploration before CFD infrastructure is set up.
 - **Chosen**: Linear sensitivity model with independent per-variable factors
 - **Rationale**: Immediate parameter exploration before CFD runs. Based on published data and physics intuition. Instantaneous computation.
 - **Known limitations**: No cross-variable interactions. Missing Cd sensitivity for ride_height/diffuser/sidepod. No wing stall modeling. Linear where reality is nonlinear. See [EXPERIMENT.md](EXPERIMENT.md) for detailed analysis.
+
+## ML Surrogate Architecture
+
+### Why 4 model types?
+Each serves a different purpose in the pipeline:
+
+| Model | Why it exists | When to use |
+|---|---|---|
+| **Linear** | Fast baseline, interpretable. Polynomial features capture some nonlinearity. | First sanity check. Compare others against it. |
+| **MLP** | Captures complex nonlinear relationships. PyTorch + CUDA for speed. | General-purpose surrogate when >50 data points available. |
+| **GP** | Provides uncertainty estimates. Enables active learning (propose where to simulate next). | Active learning loop. Small datasets (32-200 points). |
+| **PINN** | Physics constraints in loss function prevent unphysical predictions. | When model must respect Cd>0, Cl<0, range bounds. |
+
+### GP for active learning
+- **Chosen**: GPyTorch (CUDA) with sklearn fallback
+- **Acquisition functions**: Max variance (explore uncertain regions) or UCB (balance exploit/explore)
+- **Rationale**: With only 32 data points, each new CFD simulation is expensive. GP uncertainty tells us where the model is most wrong, so we simulate there next.
+- **Trade-off**: GP scales O(n^3) with dataset size. Fine for <500 points, need sparse GP beyond that.
+
+### Modulus PINN physics constraints
+Six constraints enforced via physics loss in `scripts/modulus_surrogate.py`:
+1. Cd must be positive
+2. Cl must be negative (downforce)
+3. Cd in realistic range [0.5, 1.5]
+4. Cl in range [-6.0, -1.0]
+5. L/D consistency: ld_predicted ≈ |cl|/cd
+6. L/D in range [1.0, 7.0]
+
+Physics loss weight: 0.1 (data loss weight: 1.0). Tuned to guide without overriding data.
+
+### Autoresearch pattern (Karpathy's approach adapted)
+- **Chosen**: Seed paper + experiment runner + manual loop (with aresearch CLI support)
+- **Rationale**: Mirrors Karpathy's "one GPU, one file, one metric" philosophy. Human writes research directions, agent iterates on model architecture/hyperparameters.
+- **Current limitation**: Manual loop runs only 7 fixed experiments (4 baseline models + 3 HP variations). True autoresearch needs LLM-driven hypothesis generation per iteration.
+- **Future**: Connect to OpenClaw/NemoClaw for LLM-in-the-loop experiment design.
+
+### config.yaml disconnection (known debt)
+- `config.yaml` defines all parameters, hyperparameters, and paths centrally
+- `ml/` modules use hard-coded values in `data_prep.py` (PARAM_BOUNDS) and `surrogate.py` (model architectures)
+- These MUST be wired together. Currently dual sources of truth = drift risk.
+
+## NVIDIA Omniverse Integration
+
+### STL -> USD conversion pipeline
+- `scripts/convert_to_usd.py` converts Blender-generated STL to USD format
+- Supports both binary and ASCII STL with auto-detection
+- Generates Omniverse-compatible scene with wind tunnel domain, boundary conditions, and material definitions
+- Falls back to built-in USDA writer if pxr (OpenUSD) library not available
+
+### Omniverse Flow backend
+- `scripts/omniverse_sim.py` detects Omniverse installation across OS paths
+- Three resolution presets: low (fast iteration), medium (default), high (validation)
+- Attempts Flow API first, falls back to Kit CLI subprocess
+- Returns same `SimulationResult` format as OpenFOAM backend
+
+### Warp LBM (not implemented)
+- Placeholder function in `omniverse_sim.py`. Returns None.
+- Intended for Lattice Boltzmann Method on GPU via NVIDIA Warp
+- Would complement Flow for different flow regimes
 
 ## Geometry Design
 
